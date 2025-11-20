@@ -111,7 +111,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
         duration: Duration(milliseconds: 7600),
         callback: (timer) async {
           _model.ticketlistA = await actions.sendjsontourl(
-            '{\"status\": \"${widget!.status}\"}',
+            '{\"status\": \"${widget!.status}\", \"companyId\": \"${FFAppState().companyId}\"}',
             currentJwtToken!,
             FFAppConstants.ticketListURL,
           );

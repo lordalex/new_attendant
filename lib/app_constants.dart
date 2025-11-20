@@ -13,6 +13,7 @@ abstract class FFAppConstants {
 
   /// knex
   static const String baseUrl = 'https://www.knex-app.xyz/api/';
+  static const String getUserURL = 'https://www.knex-app.xyz/api/getUser';
   static const String setTicketToParked =
       'https://www.knex-app.xyz/api/ticketToParked';
   static const String setPINtoCompleted =

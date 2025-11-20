@@ -5,6 +5,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/instant_timer.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 import '/custom_code/actions/index.dart' as actions;
@@ -44,6 +45,25 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
+      // Fetch user profile to get companyId
+      try {
+        String userProfileJson = await actions.sendjsontourl(
+          '{}',
+          currentJwtToken!,
+          FFAppConstants.getUserURL,
+        );
+        final userProfile = jsonDecode(userProfileJson);
+        if (userProfile != null &&
+            userProfile['data'] != null &&
+            userProfile['data']['companyId'] != null) {
+          FFAppState().companyId = userProfile['data']['companyId'].toString();
+        } else if (userProfile != null && userProfile['companyId'] != null) {
+          FFAppState().companyId = userProfile['companyId'].toString();
+        }
+      } catch (e) {
+        print('Error fetching/parsing user profile: $e');
+      }
+
       unawaited(
         () async {
           await actions.lockOrientation();
@@ -58,32 +78,32 @@ class _HomePageWidgetState extends State<HomePageWidget>
             _model.instantTimer?.cancel();
           }
           _model.ticketlistArrival = await actions.sendjsontourl(
-            '{\"status\": \"Arrival\"}',
+            '{\"status\": \"Arrival\", \"companyId\": \"${FFAppState().companyId}\"}',
             currentJwtToken!,
             FFAppConstants.ticketListURL,
           );
           _model.ticketlistProcessingArrival = await actions.sendjsontourl(
-            '{\"status\": \"Processing-Arrival\"}',
+            '{\"status\": \"Processing-Arrival\", \"companyId\": \"${FFAppState().companyId}\"}',
             currentJwtToken!,
             FFAppConstants.ticketListURL,
           );
           _model.ticketlistParked = await actions.sendjsontourl(
-            '{\"status\": \"Parked\"}',
+            '{\"status\": \"Parked\", \"companyId\": \"${FFAppState().companyId}\"}',
             currentJwtToken!,
             FFAppConstants.ticketListURL,
           );
           _model.ticketlistDeparture = await actions.sendjsontourl(
-            '{\"status\": \"Departure\"}',
+            '{\"status\": \"Departure\", \"companyId\": \"${FFAppState().companyId}\"}',
             currentJwtToken!,
             FFAppConstants.ticketListURL,
           );
           _model.ticketlistProcessingDeparture = await actions.sendjsontourl(
-            '{\"status\": \"Processing-Departure\"}',
+            '{\"status\": \"Processing-Departure\", \"companyId\": \"${FFAppState().companyId}\"}',
             currentJwtToken!,
             FFAppConstants.ticketListURL,
           );
           _model.ticketlistCompleted = await actions.sendjsontourl(
-            '{\"status\": \"Completed\"}',
+            '{\"status\": \"Completed\", \"companyId\": \"${FFAppState().companyId}\"}',
             currentJwtToken!,
             FFAppConstants.ticketListURL,
           );

@@ -208,6 +208,17 @@ String replaceSubstringCaseInsensitive(
 }
 
 String extractTime(String timeStr) {
+  if (timeStr == null || timeStr.trim().isEmpty) {
+    print(
+      "[INPUT_EVALUATION] ⛔ Input is null or empty. Aborting processing.",
+    );
+    return jsonEncode({
+      'error': 'NULL_OR_EMPTY_INPUT',
+      'message': 'The input string was null or empty.',
+      'original_input': timeStr,
+      'stage': 'input_validation',
+    });
+  }
   try {
     String
     stringToParse; // This will hold the actual date string to be processed.
@@ -498,24 +509,31 @@ String tostr(String element) {
 
 int stringDateToMillisecondsInt(String? stringDate) {
   // transform "00d 00h 00m 00s" to integer milliseconds
-  if (stringDate == null) {
+  if (stringDate == null || stringDate.trim().isEmpty) {
     return 0;
   }
 
   List<String> parts = stringDate.split(' ');
+  if (parts.length < 4) {
+    return 0;
+  }
 
-  int days = int.parse(parts[0].replaceAll('d', ''));
-  int hours = int.parse(parts[1].replaceAll('h', ''));
-  int minutes = int.parse(parts[2].replaceAll('m', ''));
-  int seconds = int.parse(parts[3].replaceAll('s', ''));
+  try {
+    int days = int.parse(parts[0].replaceAll('d', ''));
+    int hours = int.parse(parts[1].replaceAll('h', ''));
+    int minutes = int.parse(parts[2].replaceAll('m', ''));
+    int seconds = int.parse(parts[3].replaceAll('s', ''));
 
-  int totalMilliseconds =
-      days * 24 * 60 * 60 * 1000 +
-      hours * 60 * 60 * 1000 +
-      minutes * 60 * 1000 +
-      seconds * 1000;
+    int totalMilliseconds =
+        days * 24 * 60 * 60 * 1000 +
+        hours * 60 * 60 * 1000 +
+        minutes * 60 * 1000 +
+        seconds * 1000;
 
-  return totalMilliseconds;
+    return totalMilliseconds;
+  } catch (e) {
+    return 0;
+  }
 }
 
 String makeArryOfTickets(String jsonArrayString) {

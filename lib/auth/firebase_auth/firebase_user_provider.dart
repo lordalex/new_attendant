@@ -5,9 +5,33 @@ import '../base_auth_user_provider.dart';
 
 export '../base_auth_user_provider.dart';
 
+/// Validates the current Firebase session by forcing a token refresh.
+/// Returns true if valid, false if invalid (user deleted, token expired, etc.)
+/// Auto signs out if the session is invalid.
+Future<bool> validateFirebaseSession() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    return false;
+  }
+
+  try {
+    // Force token refresh - this will fail if user is deleted or disabled
+    await user.getIdToken(true);
+    // Reload user to check if account still exists
+    await user.reload();
+    return true;
+  } catch (e) {
+    print('Session validation failed: $e');
+    // Invalid session - sign out
+    await FirebaseAuth.instance.signOut();
+    return false;
+  }
+}
+
 class KnexattendantFirebaseUser extends BaseAuthUser {
   KnexattendantFirebaseUser(this.user);
   User? user;
+  @override
   bool get loggedIn => user != null;
 
   @override

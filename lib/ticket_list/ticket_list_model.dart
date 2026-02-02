@@ -1,25 +1,8 @@
-import 'package:knexattendant/auth/firebase_auth/auth_util.dart';
-import 'package:knexattendant/components/empty_component_list_view/empty_component_list_view_widget.dart';
-import 'package:knexattendant/components/slidables/slidable_tile_ticket_list_arrival/slidable_tile_ticket_list_arrival_widget.dart';
-import 'package:knexattendant/components/slidables/slidable_tile_ticket_list_completed/slidable_tile_ticket_list_completed_widget.dart';
-import 'package:knexattendant/components/slidables/slidable_tile_ticket_list_departure/slidable_tile_ticket_list_departure_widget.dart';
-import 'package:knexattendant/components/slidables/slidable_tile_ticket_list_parked/slidable_tile_ticket_list_parked_widget.dart';
-import 'package:knexattendant/components/slidables/slidable_tile_ticket_list_processing/slidable_tile_ticket_list_processing_widget.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_icon_button.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
 import 'package:knexattendant/flutter_flow/instant_timer.dart';
-import 'dart:ui';
-import 'package:knexattendant/custom_code/actions/index.dart' as actions;
-import 'package:knexattendant/flutter_flow/custom_functions.dart' as functions;
 import 'package:knexattendant/index.dart';
 import 'ticket_list_widget.dart' show TicketListWidget;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
-import 'package:provider/provider.dart';
 
 class TicketListModel extends FlutterFlowModel<TicketListWidget> {
   ///  Local state fields for this page.

@@ -3,9 +3,6 @@ import 'package:knexattendant/flutter_flow/flutter_flow_expanded_image_view.dart
 import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_timer.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:math';
-import 'dart:ui';
 import 'package:knexattendant/custom_code/actions/index.dart' as actions;
 import 'package:knexattendant/flutter_flow/custom_functions.dart' as functions;
 import 'package:stop_watch_timer/stop_watch_timer.dart';
@@ -14,8 +11,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:provider/provider.dart';
 import 'slidable_tile_ticket_list_parked_model.dart';
 export 'slidable_tile_ticket_list_parked_model.dart';
 
@@ -32,8 +27,8 @@ class SlidableTileTicketListParkedWidget extends StatefulWidget {
     this.lockerSpace,
     this.parkingSpace,
     required this.ticketNumber,
-  })  : this.timeTextColor = timeTextColor ?? const Color(0xFF57636C),
-        this.timerTimeIntegerMs = timerTimeIntegerMs ?? 0;
+  })  : timeTextColor = timeTextColor ?? const Color(0xFF57636C),
+        timerTimeIntegerMs = timerTimeIntegerMs ?? 0;
 
   final String? name;
   final String? plate;
@@ -72,14 +67,14 @@ class _SlidableTileTicketListParkedWidgetState
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       _model.timerController.timer.setPresetTime(
-        mSec: widget!.timerTimeIntegerMs,
+        mSec: widget.timerTimeIntegerMs,
         add: false,
       );
       _model.timerController.onResetTimer();
 
       _model.timerController.onStartTimer();
       _model.clientPhoto = await actions.base64toBytesAction(
-        widget!.profileImg!,
+        widget.profileImg!,
         'clientPhoto',
       );
     });
@@ -93,8 +88,8 @@ class _SlidableTileTicketListParkedWidgetState
             curve: Curves.elasticOut,
             delay: 0.0.ms,
             duration: 900.0.ms,
-            begin: Offset(0.0, 0.0),
-            end: Offset(-100.0, 0.0),
+            begin: const Offset(0.0, 0.0),
+            end: const Offset(-100.0, 0.0),
           ),
           FadeEffect(
             curve: Curves.easeInOut,
@@ -135,13 +130,13 @@ class _SlidableTileTicketListParkedWidgetState
                 .forward();
           }
           await Future.delayed(
-            Duration(
+            const Duration(
               milliseconds: 150,
             ),
           );
           await widget.callback?.call();
           FFAppState().isTicketOn = true;
-          FFAppState().ticketNumber = widget!.ticketNumber!;
+          FFAppState().ticketNumber = widget.ticketNumber!;
           safeSetState(() {});
         }
         _model.posx = details.localPosition.dx;
@@ -161,7 +156,7 @@ class _SlidableTileTicketListParkedWidgetState
               children: [
                 Padding(
                   padding:
-                      EdgeInsetsDirectional.fromSTEB(15.0, 10.0, 10.0, 15.0),
+                      const EdgeInsetsDirectional.fromSTEB(15.0, 10.0, 10.0, 15.0),
                   child: Container(
                     width: 87.5,
                     height: 77.3,
@@ -221,19 +216,19 @@ class _SlidableTileTicketListParkedWidgetState
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 7.0, 5.0, 7.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0.0, 7.0, 5.0, 7.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Align(
-                          alignment: AlignmentDirectional(-1.0, 0.0),
+                          alignment: const AlignmentDirectional(-1.0, 0.0),
                           child: Container(
                             width: MediaQuery.sizeOf(context).width * 0.464,
-                            decoration: BoxDecoration(),
+                            decoration: const BoxDecoration(),
                             child: Text(
                               valueOrDefault<String>(
-                                widget!.name,
+                                widget.name,
                                 'error',
                               ),
                               textAlign: TextAlign.start,
@@ -261,12 +256,12 @@ class _SlidableTileTicketListParkedWidgetState
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 5.0, 0.0, 0.0),
                           child: Container(
                             height: MediaQuery.sizeOf(context).height * 0.059,
                             decoration: BoxDecoration(
-                              color: Color(0x1E131919),
+                              color: const Color(0x1E131919),
                               borderRadius: BorderRadius.circular(5.0),
                               border: Border.all(
                                 color:
@@ -274,10 +269,10 @@ class _SlidableTileTicketListParkedWidgetState
                               ),
                             ),
                             child: Align(
-                              alignment: AlignmentDirectional(0.0, 0.0),
+                              alignment: const AlignmentDirectional(0.0, 0.0),
                               child: Text(
                                 valueOrDefault<String>(
-                                  widget!.plate,
+                                  widget.plate,
                                   'error',
                                 ),
                                 style: FlutterFlowTheme.of(context)
@@ -311,13 +306,13 @@ class _SlidableTileTicketListParkedWidgetState
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Align(
-                        alignment: AlignmentDirectional(1.0, 0.0),
+                        alignment: const AlignmentDirectional(1.0, 0.0),
                         child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 0.0, 5.0, 0.0),
                           child: Container(
                             width: 120.0,
-                            decoration: BoxDecoration(),
+                            decoration: const BoxDecoration(),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -325,8 +320,8 @@ class _SlidableTileTicketListParkedWidgetState
                                 FaIcon(
                                   FontAwesomeIcons.solidClock,
                                   color: valueOrDefault<Color>(
-                                    widget!.timerTimeIntegerMs >= 300000
-                                        ? Color(0xFFA50707)
+                                    widget.timerTimeIntegerMs >= 300000
+                                        ? const Color(0xFFA50707)
                                         : FlutterFlowTheme.of(context)
                                             .primaryText,
                                     FlutterFlowTheme.of(context).primary,
@@ -340,7 +335,7 @@ class _SlidableTileTicketListParkedWidgetState
                                         CrossAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                        padding: const EdgeInsetsDirectional.fromSTEB(
                                             6.0, 0.0, 0.0, 0.0),
                                         child: FlutterFlowTimer(
                                           initialTime:
@@ -353,13 +348,14 @@ class _SlidableTileTicketListParkedWidgetState
                                           ),
                                           controller: _model.timerController,
                                           updateStateInterval:
-                                              Duration(milliseconds: 1000),
+                                              const Duration(milliseconds: 1000),
                                           onChanged: (value, displayTime,
                                               shouldUpdate) {
                                             _model.timerMilliseconds = value;
                                             _model.timerValue = displayTime;
-                                            if (shouldUpdate)
+                                            if (shouldUpdate) {
                                               safeSetState(() {});
+                                            }
                                           },
                                           textAlign: TextAlign.start,
                                           style: FlutterFlowTheme.of(context)
@@ -369,9 +365,9 @@ class _SlidableTileTicketListParkedWidgetState
                                                     FlutterFlowTheme.of(context)
                                                         .headlineSmallFamily,
                                                 color:
-                                                    widget!.timerTimeIntegerMs >=
+                                                    widget.timerTimeIntegerMs >=
                                                             300000
-                                                        ? Color(0xFFA50707)
+                                                        ? const Color(0xFFA50707)
                                                         : FlutterFlowTheme.of(
                                                                 context)
                                                             .primaryText,
@@ -393,15 +389,15 @@ class _SlidableTileTicketListParkedWidgetState
                         ),
                       ),
                       Align(
-                        alignment: AlignmentDirectional(1.0, 0.0),
+                        alignment: const AlignmentDirectional(1.0, 0.0),
                         child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 0.0, 5.0, 0.0),
                           child: Container(
                             width: 120.0,
-                            decoration: BoxDecoration(),
+                            decoration: const BoxDecoration(),
                             child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   0.0, 3.0, 0.0, 3.0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
@@ -414,11 +410,11 @@ class _SlidableTileTicketListParkedWidgetState
                                     size: 17.0,
                                   ),
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         4.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       functions.tostr(valueOrDefault<String>(
-                                        widget!.lockerSpace,
+                                        widget.lockerSpace,
                                         'n/a',
                                       )),
                                       textAlign: TextAlign.start,
@@ -449,13 +445,13 @@ class _SlidableTileTicketListParkedWidgetState
                         ),
                       ),
                       Align(
-                        alignment: AlignmentDirectional(1.0, 0.0),
+                        alignment: const AlignmentDirectional(1.0, 0.0),
                         child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 3.0, 5.0, 3.0),
                           child: Container(
                             width: 120.0,
-                            decoration: BoxDecoration(),
+                            decoration: const BoxDecoration(),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -466,11 +462,11 @@ class _SlidableTileTicketListParkedWidgetState
                                   size: 17.0,
                                 ),
                                 Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       4.0, 0.0, 0.0, 0.0),
                                   child: Text(
                                     functions.tostr(valueOrDefault<String>(
-                                      widget!.parkingSpace,
+                                      widget.parkingSpace,
                                       'n/a',
                                     )),
                                     textAlign: TextAlign.start,

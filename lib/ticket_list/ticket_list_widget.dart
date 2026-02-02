@@ -8,9 +8,7 @@ import 'package:knexattendant/components/slidables/slidable_tile_ticket_list_pro
 import 'package:knexattendant/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
 import 'package:knexattendant/flutter_flow/instant_timer.dart';
-import 'dart:ui';
 import 'package:knexattendant/custom_code/actions/index.dart' as actions;
 import 'package:knexattendant/flutter_flow/custom_functions.dart' as functions;
 import 'package:knexattendant/index.dart';
@@ -18,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
-import 'package:provider/provider.dart';
 import 'ticket_list_model.dart';
 export 'ticket_list_model.dart';
 
@@ -27,7 +24,7 @@ class TicketListWidget extends StatefulWidget {
     super.key,
     String? titleStatus,
     required this.status,
-  }) : this.titleStatus = titleStatus ?? 'Text';
+  }) : titleStatus = titleStatus ?? 'Text';
 
   final String titleStatus;
   final String? status;
@@ -52,67 +49,67 @@ class _TicketListWidgetState extends State<TicketListWidget>
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (widget!.titleStatus == 'Arrival') {
+      if (widget.titleStatus == 'Arrival') {
         safeSetState(() {
           _model.tabBarController!.animateTo(
             0,
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.ease,
           );
         });
-      } else if (widget!.titleStatus == 'Processing-Arrival') {
+      } else if (widget.titleStatus == 'Processing-Arrival') {
         safeSetState(() {
           _model.tabBarController!.animateTo(
             1,
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.ease,
           );
         });
-      } else if (widget!.titleStatus == 'Parked') {
+      } else if (widget.titleStatus == 'Parked') {
         safeSetState(() {
           _model.tabBarController!.animateTo(
             2,
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.ease,
           );
         });
-      } else if (widget!.titleStatus == 'Departure') {
+      } else if (widget.titleStatus == 'Departure') {
         safeSetState(() {
           _model.tabBarController!.animateTo(
             3,
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.ease,
           );
         });
-      } else if (widget!.titleStatus == 'Processing-Departure') {
+      } else if (widget.titleStatus == 'Processing-Departure') {
         safeSetState(() {
           _model.tabBarController!.animateTo(
             4,
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.ease,
           );
         });
-      } else if (widget!.titleStatus == 'Completed') {
+      } else if (widget.titleStatus == 'Completed') {
         safeSetState(() {
           _model.tabBarController!.animateTo(
             5,
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.ease,
           );
         });
       }
 
       _model.instantTimer2?.cancel();
-      _model.status = widget!.status!;
+      _model.status = widget.status!;
       safeSetState(() {});
       _model.tmpBuffer = ' ';
       safeSetState(() {});
       _model.instantTimer2 = InstantTimer.periodic(
-        duration: Duration(milliseconds: 7600),
+        duration: const Duration(milliseconds: 7600),
         callback: (timer) async {
           _model.ticketlistA = await actions.sendjsontourl(
-            '{\"status\": \"${widget!.status}\"}',
-            currentJwtToken!,
+            '{\"status\": \"${widget.status}\"}',
+            currentJwtToken,
             FFAppConstants.ticketListURL,
           );
           if (_model.ticketlistA == '401') {
@@ -143,9 +140,9 @@ class _TicketListWidgetState extends State<TicketListWidget>
       initialIndex: min(
           valueOrDefault<int>(
             () {
-              if (widget!.status == 'Arrival') {
+              if (widget.status == 'Arrival') {
                 return 0;
-              } else if (widget!.status == 'Processing-Arrival') {
+              } else if (widget.status == 'Processing-Arrival') {
                 return 1;
               } else {
                 return 2;
@@ -180,14 +177,14 @@ class _TicketListWidgetState extends State<TicketListWidget>
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         appBar: AppBar(
-          backgroundColor: Color(0xFF131919),
+          backgroundColor: const Color(0xFF131919),
           automaticallyImplyLeading: false,
           leading: FlutterFlowIconButton(
             borderColor: Colors.transparent,
             borderRadius: 30.0,
             borderWidth: 1.0,
             buttonSize: 60.0,
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back_ios_sharp,
               color: Colors.white,
               size: 30.0,
@@ -228,14 +225,14 @@ class _TicketListWidgetState extends State<TicketListWidget>
                       FlutterFlowTheme.of(context).headlineMedium.fontStyle,
                 ),
           ),
-          actions: [],
+          actions: const [],
           centerTitle: true,
           elevation: 2.0,
         ),
         body: SafeArea(
           top: true,
           child: Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 2.0),
+            padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 2.0),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
@@ -243,7 +240,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                   child: Column(
                     children: [
                       Align(
-                        alignment: Alignment(0.0, 0),
+                        alignment: const Alignment(0.0, 0),
                         child: TabBar(
                           labelColor: FlutterFlowTheme.of(context).primaryText,
                           unselectedLabelColor:
@@ -269,7 +266,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                     .titleMediumIsCustom,
                               ),
                           indicatorColor: FlutterFlowTheme.of(context).primary,
-                          tabs: [
+                          tabs: const [
                             Tab(
                               text: 'Arrival',
                               icon: Icon(
@@ -327,7 +324,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                     ),
                                   }.withoutNulls,
                                   extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
+                                    kTransitionInfoKey: const TransitionInfo(
                                       hasTransition: true,
                                       transitionType: PageTransitionType.fade,
                                       duration: Duration(milliseconds: 0),
@@ -345,7 +342,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                     ),
                                   }.withoutNulls,
                                   extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
+                                    kTransitionInfoKey: const TransitionInfo(
                                       hasTransition: true,
                                       transitionType: PageTransitionType.fade,
                                       duration: Duration(milliseconds: 0),
@@ -363,7 +360,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                     ),
                                   }.withoutNulls,
                                   extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
+                                    kTransitionInfoKey: const TransitionInfo(
                                       hasTransition: true,
                                       transitionType: PageTransitionType.fade,
                                       duration: Duration(milliseconds: 0),
@@ -385,7 +382,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                     ),
                                   }.withoutNulls,
                                   extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
+                                    kTransitionInfoKey: const TransitionInfo(
                                       hasTransition: true,
                                       transitionType: PageTransitionType.fade,
                                       duration: Duration(milliseconds: 0),
@@ -407,7 +404,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                     ),
                                   }.withoutNulls,
                                   extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
+                                    kTransitionInfoKey: const TransitionInfo(
                                       hasTransition: true,
                                       transitionType: PageTransitionType.fade,
                                       duration: Duration(milliseconds: 0),
@@ -432,7 +429,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                     ),
                                   }.withoutNulls,
                                   extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
+                                    kTransitionInfoKey: const TransitionInfo(
                                       hasTransition: true,
                                       transitionType: PageTransitionType.fade,
                                       duration: Duration(milliseconds: 0),
@@ -450,7 +447,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                           physics: const NeverScrollableScrollPhysics(),
                           children: [
                             Align(
-                              alignment: AlignmentDirectional(0.0, -1.0),
+                              alignment: const AlignmentDirectional(0.0, -1.0),
                               child: SingleChildScrollView(
                                 primary: false,
                                 child: Column(
@@ -462,7 +459,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                       height:
                                           MediaQuery.sizeOf(context).height *
                                               0.7,
-                                      decoration: BoxDecoration(),
+                                      decoration: const BoxDecoration(),
                                       child: SingleChildScrollView(
                                         child: Column(
                                           mainAxisSize: MainAxisSize.max,
@@ -474,7 +471,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                     final ticketL =
                                                         _model.tickets.toList();
                                                     if (ticketL.isEmpty) {
-                                                      return Center(
+                                                      return const Center(
                                                         child:
                                                             EmptyComponentListViewWidget(),
                                                       );
@@ -482,7 +479,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
 
                                                     return ListView.builder(
                                                       padding:
-                                                          EdgeInsets.fromLTRB(
+                                                          const EdgeInsets.fromLTRB(
                                                         0,
                                                         0,
                                                         0,
@@ -574,7 +571,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                                               FlutterFlowTheme.of(context).primaryText,
                                                                         ),
                                                                       ),
-                                                                      duration: Duration(
+                                                                      duration: const Duration(
                                                                           milliseconds:
                                                                               4000),
                                                                       backgroundColor:
@@ -587,7 +584,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                                       await actions
                                                                           .sendjsontourl(
                                                                     '{\"ticket_number\": ${functions.getkeyfromjsonstring(ticketLItem, 'ticket_number')}}',
-                                                                    currentJwtToken!,
+                                                                    currentJwtToken,
                                                                     FFAppConstants
                                                                         .settickettoprocessing,
                                                                   );
@@ -618,15 +615,15 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                           .primaryBackground,
                                                     ),
                                                     alignment:
-                                                        AlignmentDirectional(
+                                                        const AlignmentDirectional(
                                                             0.0, 0.0),
                                                     child: Align(
                                                       alignment:
-                                                          AlignmentDirectional(
+                                                          const AlignmentDirectional(
                                                               0.0, -1.0),
                                                       child: Padding(
                                                         padding:
-                                                            EdgeInsetsDirectional
+                                                            const EdgeInsetsDirectional
                                                                 .fromSTEB(
                                                                     0.0,
                                                                     60.0,
@@ -638,7 +635,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                           height: 185.1,
                                                           fit: BoxFit.contain,
                                                           frameRate:
-                                                              FrameRate(60.0),
+                                                              const FrameRate(60.0),
                                                           animate: true,
                                                         ),
                                                       ),
@@ -655,7 +652,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                               ),
                             ),
                             Align(
-                              alignment: AlignmentDirectional(0.0, -1.0),
+                              alignment: const AlignmentDirectional(0.0, -1.0),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -664,7 +661,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                     width: double.infinity,
                                     height:
                                         MediaQuery.sizeOf(context).height * 0.7,
-                                    decoration: BoxDecoration(),
+                                    decoration: const BoxDecoration(),
                                     child: SingleChildScrollView(
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -672,14 +669,14 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                           Stack(
                                             children: [
                                               Align(
-                                                alignment: AlignmentDirectional(
+                                                alignment: const AlignmentDirectional(
                                                     0.0, -1.0),
                                                 child: Builder(
                                                   builder: (context) {
                                                     final ticketL =
                                                         _model.tickets.toList();
                                                     if (ticketL.isEmpty) {
-                                                      return Center(
+                                                      return const Center(
                                                         child:
                                                             EmptyComponentListViewWidget(),
                                                       );
@@ -687,7 +684,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
 
                                                     return ListView.builder(
                                                       padding:
-                                                          EdgeInsets.fromLTRB(
+                                                          const EdgeInsets.fromLTRB(
                                                         0,
                                                         0,
                                                         0,
@@ -765,7 +762,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                                   () async {
                                                                 await Future
                                                                     .delayed(
-                                                                  Duration(
+                                                                  const Duration(
                                                                     milliseconds:
                                                                         150,
                                                                   ),
@@ -813,15 +810,15 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                         .primaryBackground,
                                                   ),
                                                   alignment:
-                                                      AlignmentDirectional(
+                                                      const AlignmentDirectional(
                                                           0.0, 0.0),
                                                   child: Align(
                                                     alignment:
-                                                        AlignmentDirectional(
+                                                        const AlignmentDirectional(
                                                             0.0, -1.0),
                                                     child: Padding(
                                                       padding:
-                                                          EdgeInsetsDirectional
+                                                          const EdgeInsetsDirectional
                                                               .fromSTEB(
                                                                   0.0,
                                                                   60.0,
@@ -833,7 +830,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                         height: 185.1,
                                                         fit: BoxFit.contain,
                                                         frameRate:
-                                                            FrameRate(60.0),
+                                                            const FrameRate(60.0),
                                                         animate: true,
                                                       ),
                                                     ),
@@ -857,17 +854,17 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                     children: [
                                       Align(
                                         alignment:
-                                            AlignmentDirectional(0.0, -1.0),
+                                            const AlignmentDirectional(0.0, -1.0),
                                         child: Builder(
                                           builder: (context) {
                                             final ticketL =
                                                 _model.tickets.toList();
                                             if (ticketL.isEmpty) {
-                                              return EmptyComponentListViewWidget();
+                                              return const EmptyComponentListViewWidget();
                                             }
 
                                             return ListView.builder(
-                                              padding: EdgeInsets.fromLTRB(
+                                              padding: const EdgeInsets.fromLTRB(
                                                 0,
                                                 0,
                                                 0,
@@ -969,12 +966,12 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                 .primaryBackground,
                                           ),
                                           alignment:
-                                              AlignmentDirectional(0.0, 0.0),
+                                              const AlignmentDirectional(0.0, 0.0),
                                           child: Align(
                                             alignment:
-                                                AlignmentDirectional(0.0, -1.0),
+                                                const AlignmentDirectional(0.0, -1.0),
                                             child: Padding(
-                                              padding: EdgeInsetsDirectional
+                                              padding: const EdgeInsetsDirectional
                                                   .fromSTEB(
                                                       0.0, 60.0, 0.0, 0.0),
                                               child: Lottie.asset(
@@ -982,7 +979,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                 width: 180.58,
                                                 height: 185.1,
                                                 fit: BoxFit.contain,
-                                                frameRate: FrameRate(60.0),
+                                                frameRate: const FrameRate(60.0),
                                                 animate: true,
                                               ),
                                             ),
@@ -1000,17 +997,17 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                   children: [
                                     Align(
                                       alignment:
-                                          AlignmentDirectional(0.0, -1.0),
+                                          const AlignmentDirectional(0.0, -1.0),
                                       child: Builder(
                                         builder: (context) {
                                           final ticketsDeparture =
                                               _model.tickets.toList();
                                           if (ticketsDeparture.isEmpty) {
-                                            return EmptyComponentListViewWidget();
+                                            return const EmptyComponentListViewWidget();
                                           }
 
                                           return ListView.builder(
-                                            padding: EdgeInsets.fromLTRB(
+                                            padding: const EdgeInsets.fromLTRB(
                                               0,
                                               0,
                                               0,
@@ -1094,7 +1091,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                             await actions
                                                                 .sendjsontourl(
                                                           '{\"ticket_number\": ${functions.getkeyfromjsonstring(ticketsDepartureItem, 'ticket_number')}}',
-                                                          currentJwtToken!,
+                                                          currentJwtToken,
                                                           FFAppConstants
                                                               .settickettoprocessing,
                                                         );
@@ -1122,20 +1119,20 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                               .primaryBackground,
                                         ),
                                         alignment:
-                                            AlignmentDirectional(0.0, 0.0),
+                                            const AlignmentDirectional(0.0, 0.0),
                                         child: Align(
                                           alignment:
-                                              AlignmentDirectional(0.0, -1.0),
+                                              const AlignmentDirectional(0.0, -1.0),
                                           child: Padding(
                                             padding:
-                                                EdgeInsetsDirectional.fromSTEB(
+                                                const EdgeInsetsDirectional.fromSTEB(
                                                     0.0, 60.0, 0.0, 0.0),
                                             child: Lottie.asset(
                                               'assets/jsons/loading2.json',
                                               width: 180.58,
                                               height: 185.1,
                                               fit: BoxFit.contain,
-                                              frameRate: FrameRate(60.0),
+                                              frameRate: const FrameRate(60.0),
                                               animate: true,
                                             ),
                                           ),
@@ -1146,7 +1143,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                               ],
                             ),
                             Align(
-                              alignment: AlignmentDirectional(0.0, 0.0),
+                              alignment: const AlignmentDirectional(0.0, 0.0),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
@@ -1158,11 +1155,11 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                               _model.tickets.toList();
                                           if (ticketsProcessingDeparture
                                               .isEmpty) {
-                                            return EmptyComponentListViewWidget();
+                                            return const EmptyComponentListViewWidget();
                                           }
 
                                           return ListView.builder(
-                                            padding: EdgeInsets.fromLTRB(
+                                            padding: const EdgeInsets.fromLTRB(
                                               0,
                                               0,
                                               0,
@@ -1261,12 +1258,12 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                 .primaryBackground,
                                           ),
                                           alignment:
-                                              AlignmentDirectional(0.0, 0.0),
+                                              const AlignmentDirectional(0.0, 0.0),
                                           child: Align(
                                             alignment:
-                                                AlignmentDirectional(0.0, -1.0),
+                                                const AlignmentDirectional(0.0, -1.0),
                                             child: Padding(
-                                              padding: EdgeInsetsDirectional
+                                              padding: const EdgeInsetsDirectional
                                                   .fromSTEB(
                                                       0.0, 60.0, 0.0, 0.0),
                                               child: Lottie.asset(
@@ -1274,7 +1271,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                 width: 180.58,
                                                 height: 185.1,
                                                 fit: BoxFit.contain,
-                                                frameRate: FrameRate(60.0),
+                                                frameRate: const FrameRate(60.0),
                                                 animate: true,
                                               ),
                                             ),
@@ -1293,7 +1290,7 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                   Container(
                                     height: MediaQuery.sizeOf(context).height *
                                         0.717,
-                                    decoration: BoxDecoration(),
+                                    decoration: const BoxDecoration(),
                                     child:
                                         // historial de carros parkeados en las ultimas 24h
                                         Builder(
@@ -1302,11 +1299,11 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                             _model.tickets.toList();
                                         if (ticketsProcessingCompleted
                                             .isEmpty) {
-                                          return EmptyComponentListViewWidget();
+                                          return const EmptyComponentListViewWidget();
                                         }
 
                                         return ListView.builder(
-                                          padding: EdgeInsets.fromLTRB(
+                                          padding: const EdgeInsets.fromLTRB(
                                             0,
                                             0,
                                             0,
@@ -1385,19 +1382,19 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                       color: FlutterFlowTheme.of(context)
                                           .primaryBackground,
                                     ),
-                                    alignment: AlignmentDirectional(0.0, 0.0),
+                                    alignment: const AlignmentDirectional(0.0, 0.0),
                                     child: Align(
                                       alignment:
-                                          AlignmentDirectional(0.0, -1.0),
+                                          const AlignmentDirectional(0.0, -1.0),
                                       child: Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                        padding: const EdgeInsetsDirectional.fromSTEB(
                                             0.0, 60.0, 0.0, 0.0),
                                         child: Lottie.asset(
                                           'assets/jsons/loading2.json',
                                           width: 180.58,
                                           height: 185.1,
                                           fit: BoxFit.contain,
-                                          frameRate: FrameRate(60.0),
+                                          frameRate: const FrameRate(60.0),
                                           animate: true,
                                         ),
                                       ),

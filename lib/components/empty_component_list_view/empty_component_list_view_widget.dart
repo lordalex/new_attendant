@@ -1,10 +1,6 @@
 import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'empty_component_list_view_model.dart';
 export 'empty_component_list_view_model.dart';
 
@@ -42,12 +38,12 @@ class _EmptyComponentListViewWidgetState
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: AlignmentDirectional(0.0, 0.0),
+      alignment: const AlignmentDirectional(0.0, 0.0),
       child: Container(
-        decoration: BoxDecoration(),
-        alignment: AlignmentDirectional(0.0, 0.0),
+        decoration: const BoxDecoration(),
+        alignment: const AlignmentDirectional(0.0, 0.0),
         child: Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(0.0, 50.0, 0.0, 0.0),
+          padding: const EdgeInsetsDirectional.fromSTEB(0.0, 50.0, 0.0, 0.0),
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -58,7 +54,7 @@ class _EmptyComponentListViewWidgetState
                 size: 72.0,
               ),
               Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
+                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
                 child: Text(
                   'No Tickets',
                   style: FlutterFlowTheme.of(context).headlineMedium.override(
@@ -71,7 +67,7 @@ class _EmptyComponentListViewWidgetState
                 ),
               ),
               Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
+                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
                 child: Text(
                   'No tickets found',
                   textAlign: TextAlign.center,

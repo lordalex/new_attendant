@@ -2,9 +2,6 @@ import 'package:knexattendant/flutter_flow/flutter_flow_animations.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_timer.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:math';
-import 'dart:ui';
 import 'package:knexattendant/custom_code/actions/index.dart' as actions;
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:styled_divider/styled_divider.dart';
@@ -29,9 +26,9 @@ class SlidableTileTicketListArrivalWidget extends StatefulWidget {
     int? timerTimeIntegerMs,
     String? vehicleInfo,
     required this.date,
-  })  : this.timeTextColor = timeTextColor ?? const Color(0xFF57636C),
-        this.timerTimeIntegerMs = timerTimeIntegerMs ?? 0,
-        this.vehicleInfo = vehicleInfo ?? ' ';
+  })  : timeTextColor = timeTextColor ?? const Color(0xFF57636C),
+        timerTimeIntegerMs = timerTimeIntegerMs ?? 0,
+        vehicleInfo = vehicleInfo ?? ' ';
 
   final String? name;
   final String? plate;
@@ -74,15 +71,15 @@ class _SlidableTileTicketListArrivalWidgetState
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       _model.timerController.timer.setPresetTime(
-        mSec: widget!.timerTimeIntegerMs,
+        mSec: widget.timerTimeIntegerMs,
         add: false,
       );
       _model.timerController.onResetTimer();
 
       _model.timerController.onStartTimer();
-      if (widget!.profileImg != null && widget!.profileImg != '') {
+      if (widget.profileImg != null && widget.profileImg != '') {
         _model.clientPhoto1 = await actions.base64toBytesAction(
-          widget!.profileImg!,
+          widget.profileImg!,
           'clientPhoto',
         );
         _model.clientPhoto = _model.clientPhoto1;
@@ -106,8 +103,8 @@ class _SlidableTileTicketListArrivalWidgetState
             curve: Curves.elasticOut,
             delay: 0.0.ms,
             duration: 900.0.ms,
-            begin: Offset(0.0, 0.0),
-            end: Offset(-100.0, 0.0),
+            begin: const Offset(0.0, 0.0),
+            end: const Offset(-100.0, 0.0),
           ),
           FadeEffect(
             curve: Curves.easeInOut,
@@ -149,7 +146,7 @@ class _SlidableTileTicketListArrivalWidgetState
                 .forward();
           }
           await Future.delayed(
-            Duration(
+            const Duration(
               milliseconds: 150,
             ),
           );
@@ -172,7 +169,7 @@ class _SlidableTileTicketListArrivalWidgetState
               children: [
                 Padding(
                   padding:
-                      EdgeInsetsDirectional.fromSTEB(15.0, 10.0, 15.0, 15.0),
+                      const EdgeInsetsDirectional.fromSTEB(15.0, 10.0, 15.0, 15.0),
                   child: Container(
                     width: 60.0,
                     height: 77.6,
@@ -206,21 +203,21 @@ class _SlidableTileTicketListArrivalWidgetState
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 7.0, 5.0, 7.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0.0, 7.0, 5.0, 7.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Align(
-                          alignment: AlignmentDirectional(-1.0, 0.0),
+                          alignment: const AlignmentDirectional(-1.0, 0.0),
                           child: Container(
                             width: MediaQuery.sizeOf(context).width * 0.464,
-                            decoration: BoxDecoration(),
+                            decoration: const BoxDecoration(),
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 Text(
-                                  widget!.date!,
+                                  widget.date!,
                                   textAlign: TextAlign.start,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
@@ -246,13 +243,13 @@ class _SlidableTileTicketListArrivalWidgetState
                                       ),
                                 ),
                                 Align(
-                                  alignment: AlignmentDirectional(0.0, 0.0),
+                                  alignment: const AlignmentDirectional(0.0, 0.0),
                                   child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         0.0, 18.0, 0.0, 0.0),
                                     child: Text(
                                       valueOrDefault<String>(
-                                        widget!.name,
+                                        widget.name,
                                         'FULL NAME',
                                       ),
                                       style: FlutterFlowTheme.of(context)
@@ -288,21 +285,21 @@ class _SlidableTileTicketListArrivalWidgetState
                 ),
                 Expanded(
                   child: Align(
-                    alignment: AlignmentDirectional(1.0, 0.0),
+                    alignment: const AlignmentDirectional(1.0, 0.0),
                     child: Padding(
                       padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 5.0, 0.0),
+                          const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 5.0, 0.0),
                       child: Container(
                         width: 120.0,
-                        decoration: BoxDecoration(),
+                        decoration: const BoxDecoration(),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             FaIcon(
                               FontAwesomeIcons.solidClock,
-                              color: widget!.timerTimeIntegerMs >= 300000
-                                  ? Color(0xFFA50707)
+                              color: widget.timerTimeIntegerMs >= 300000
+                                  ? const Color(0xFFA50707)
                                   : FlutterFlowTheme.of(context).primaryText,
                               size: 17.0,
                             ),
@@ -312,7 +309,7 @@ class _SlidableTileTicketListArrivalWidgetState
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         6.0, 0.0, 0.0, 0.0),
                                     child: FlutterFlowTimer(
                                       initialTime: _model.timerInitialTimeMs,
@@ -324,7 +321,7 @@ class _SlidableTileTicketListArrivalWidgetState
                                       ),
                                       controller: _model.timerController,
                                       updateStateInterval:
-                                          Duration(milliseconds: 1000),
+                                          const Duration(milliseconds: 1000),
                                       onChanged:
                                           (value, displayTime, shouldUpdate) {
                                         _model.timerMilliseconds = value;
@@ -338,9 +335,9 @@ class _SlidableTileTicketListArrivalWidgetState
                                             fontFamily:
                                                 FlutterFlowTheme.of(context)
                                                     .headlineSmallFamily,
-                                            color: widget!.timerTimeIntegerMs >=
+                                            color: widget.timerTimeIntegerMs >=
                                                     300000
-                                                ? Color(0xFFA50707)
+                                                ? const Color(0xFFA50707)
                                                 : FlutterFlowTheme.of(context)
                                                     .primaryText,
                                             fontSize: 22.0,

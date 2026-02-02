@@ -1,12 +1,9 @@
 import 'package:knexattendant/auth/firebase_auth/auth_util.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
 import 'package:knexattendant/custom_code/actions/index.dart' as actions;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'empty_message_model.dart';
 export 'empty_message_model.dart';
 
@@ -14,7 +11,7 @@ class EmptyMessageWidget extends StatefulWidget {
   const EmptyMessageWidget({
     super.key,
     String? messageJson,
-  }) : this.messageJson = messageJson ?? '{}';
+  }) : messageJson = messageJson ?? '{}';
 
   final String messageJson;
 
@@ -40,7 +37,7 @@ class _EmptyMessageWidgetState extends State<EmptyMessageWidget> {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       _model.messagesListJson = await actions.sendjsontourl(
         '{}',
-        currentJwtToken!,
+        currentJwtToken,
         FFAppConstants.getMessagesURL,
       );
     });
@@ -56,7 +53,7 @@ class _EmptyMessageWidgetState extends State<EmptyMessageWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 1.0),
+      padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 1.0),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -65,7 +62,7 @@ class _EmptyMessageWidgetState extends State<EmptyMessageWidget> {
             BoxShadow(
               blurRadius: 0.0,
               color: FlutterFlowTheme.of(context).primaryBackground,
-              offset: Offset(
+              offset: const Offset(
                 0.0,
                 1.0,
               ),
@@ -76,13 +73,13 @@ class _EmptyMessageWidgetState extends State<EmptyMessageWidget> {
         child: Container(
           width: MediaQuery.sizeOf(context).width * 0.8,
           height: double.infinity,
-          constraints: BoxConstraints(
+          constraints: const BoxConstraints(
             minHeight: 25.0,
             maxHeight: 500.0,
           ),
           decoration: BoxDecoration(
             color: FlutterFlowTheme.of(context).accent2,
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(15.0),
               bottomRight: Radius.circular(15.0),
               topLeft: Radius.circular(15.0),
@@ -94,9 +91,9 @@ class _EmptyMessageWidgetState extends State<EmptyMessageWidget> {
             ),
           ),
           child: Align(
-            alignment: AlignmentDirectional(0.0, 0.0),
+            alignment: const AlignmentDirectional(0.0, 0.0),
             child: Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
+              padding: const EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
               child: Text(
                 'NO MESSAGES',
                 style: FlutterFlowTheme.of(context).bodySmall.override(

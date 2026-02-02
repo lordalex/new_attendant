@@ -1,23 +1,21 @@
 // Automatic FlutterFlow imports
-import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
 // Imports other custom actions
-import 'package:knexattendant/flutter_flow/custom_functions.dart'; // Imports custom functions
-import 'package:flutter/material.dart';
+// Imports custom functions
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class statusResponse {
+class StatusResponse {
   final bool success;
   final String message;
   final dynamic data;
   final String? error;
   final int? statusCode;
 
-  statusResponse({
+  StatusResponse({
     required this.success,
     required this.message,
     this.data,
@@ -36,17 +34,17 @@ class statusResponse {
 
 // Logging levels with color coding
 enum LogLevel {
-  INFO,
-  WARNING,
-  ERROR;
+  info,
+  warning,
+  error;
 
   String get ansiColor {
     switch (this) {
-      case LogLevel.INFO:
+      case LogLevel.info:
         return '\x1B[32m'; // Green
-      case LogLevel.WARNING:
+      case LogLevel.warning:
         return '\x1B[33m'; // Yellow
-      case LogLevel.ERROR:
+      case LogLevel.error:
         return '\x1B[31m'; // Red
     }
   }
@@ -56,7 +54,7 @@ enum LogLevel {
 void logMessage(LogLevel level, String message) {
   final timestamp = DateTime.now().toIso8601String();
   final prefix = level.toString().split('.').last;
-  final resetColor = '\x1B[0m';
+  const resetColor = '\x1B[0m';
   print('${level.ansiColor}[$timestamp][$prefix] $message$resetColor');
 }
 
@@ -81,7 +79,7 @@ class InputValidator {
     try {
       final uri = Uri.parse(firebaseUrl);
       if (!uri.isAbsolute) {
-        throw FormatException('Invalid firebase URL format');
+        throw const FormatException('Invalid firebase URL format');
       }
     } catch (e) {
       throw FormatException('Invalid URL format: $e');
@@ -94,10 +92,10 @@ Future<String> setStatus(
   String token,
   String status,
 ) async {
-  logMessage(LogLevel.INFO, 'Starting sendstatus operation');
+  logMessage(LogLevel.info, 'Starting sendstatus operation');
   try {
     // Validate inputs
-    logMessage(LogLevel.INFO, 'Validating input parameters');
+    logMessage(LogLevel.info, 'Validating input parameters');
     InputValidator.validateInputs(
       token: token,
       status: status,
@@ -114,13 +112,13 @@ Future<String> setStatus(
       },
     );
     // Process response
-    final statusResponse = _processResponse(response);
-    logMessage(LogLevel.INFO, 'Operation completed successfully');
-    return jsonEncode(statusResponse.toJson());
+    final statusResult = _processResponse(response);
+    logMessage(LogLevel.info, 'Operation completed successfully');
+    return jsonEncode(statusResult.toJson());
   } catch (e) {
-    logMessage(LogLevel.ERROR, 'Error in sendstatus: $e');
+    logMessage(LogLevel.error, 'Error in sendstatus: $e');
     return jsonEncode(
-      statusResponse(
+      StatusResponse(
         success: false,
         message: 'Operation failed',
         error: e.toString(),
@@ -141,7 +139,7 @@ Future<http.Response> _sendRequestWithRetry({
   while (attempts < maxRetries) {
     try {
       logMessage(
-        LogLevel.INFO,
+        LogLevel.info,
         'Sending HTTP request (attempt ${attempts + 1}/$maxRetries)',
       );
 
@@ -159,13 +157,13 @@ Future<http.Response> _sendRequestWithRetry({
       attempts++;
       if (attempts < maxRetries) {
         logMessage(
-          LogLevel.WARNING,
+          LogLevel.warning,
           'Request failed with ${response.statusCode}, retrying...',
         );
         await Future.delayed(retryDelay * attempts);
       }
     } on http.ClientException catch (e) {
-      logMessage(LogLevel.ERROR, 'Network error: $e');
+      logMessage(LogLevel.error, 'Network error: $e');
       attempts++;
       if (attempts >= maxRetries) rethrow;
       await Future.delayed(retryDelay * attempts);
@@ -175,11 +173,11 @@ Future<http.Response> _sendRequestWithRetry({
 }
 
 // Helper function to process HTTP response
-statusResponse _processResponse(http.Response response) {
-  logMessage(LogLevel.INFO, 'Processing response: ${response.statusCode}');
+StatusResponse _processResponse(http.Response response) {
+  logMessage(LogLevel.info, 'Processing response: ${response.statusCode}');
 
   if (response.statusCode >= 200 && response.statusCode < 300) {
-    return statusResponse(
+    return StatusResponse(
       success: true,
       message: 'status updated successfully',
       data: jsonDecode(response.body),
@@ -187,7 +185,7 @@ statusResponse _processResponse(http.Response response) {
     );
   }
 
-  return statusResponse(
+  return StatusResponse(
     success: false,
     message: 'Failed to update status: ${response.reasonPhrase}',
     error: response.body,

@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
-import 'flutter_flow_util.dart';
 
 Widget wrapWithModel<T extends FlutterFlowModel>({
   required T model,
@@ -52,7 +51,7 @@ abstract class FlutterFlowModel<W extends Widget> {
   // parameters of the widget, for example.
   W? _widget;
   W? get widget => _widget;
-  void set widget(W? newWidget) {
+  set widget(W? newWidget) {
     _widget = newWidget;
   }
 
@@ -130,7 +129,11 @@ class FlutterFlowDynamicModels<T extends FlutterFlowModel> {
     return model != null ? getValue(model) : null;
   }
 
-  void dispose() => _childrenModels.values.forEach((model) => model.dispose());
+  void dispose() {
+    for (final model in _childrenModels.values) {
+      model.dispose();
+    }
+  }
 
   void _updateActiveKeys(String uniqueKey) {
     final shouldResetActiveKeys = _activeKeys == null;
@@ -157,13 +160,13 @@ class FlutterFlowDynamicModels<T extends FlutterFlowModel> {
 
 T? _getDefaultValue<T>() {
   switch (T) {
-    case int:
+    case const (int):
       return 0 as T;
-    case double:
+    case const (double):
       return 0.0 as T;
-    case String:
+    case const (String):
       return '' as T;
-    case bool:
+    case const (bool):
       return false as T;
     default:
       return null as T;

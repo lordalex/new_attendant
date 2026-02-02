@@ -1,12 +1,8 @@
 import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import 'package:knexattendant/flutter_flow/custom_functions.dart' as functions;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'message_model.dart';
 export 'message_model.dart';
 
@@ -14,7 +10,7 @@ class MessageWidget extends StatefulWidget {
   const MessageWidget({
     super.key,
     String? messageJson,
-  }) : this.messageJson = messageJson ?? '{}';
+  }) : messageJson = messageJson ?? '{}';
 
   final String messageJson;
 
@@ -41,50 +37,43 @@ class _MessageWidgetState extends State<MessageWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            widget!.messageJson,
+            widget.messageJson,
             style: TextStyle(
               color: FlutterFlowTheme.of(context).primaryText,
             ),
           ),
-          duration: Duration(milliseconds: 4000),
+          duration: const Duration(milliseconds: 4000),
           backgroundColor: FlutterFlowTheme.of(context).secondary,
         ),
       );
-      if (widget!.messageJson != null && widget!.messageJson != '') {
-        if (functions.getkeyfromjsonstring(widget!.messageJson, 'remitent') !=
-                null &&
-            functions.getkeyfromjsonstring(widget!.messageJson, 'remitent') !=
+      if (widget.messageJson != '') {
+        if (functions.getkeyfromjsonstring(widget.messageJson, 'remitent') !=
                 '') {
           _model.remitent =
-              functions.getkeyfromjsonstring(widget!.messageJson, 'remitent');
+              functions.getkeyfromjsonstring(widget.messageJson, 'remitent');
         } else {
           _model.remitent = 'No Remitent';
         }
 
         if (functions.getkeyfromjsonstring(
-                    widget!.messageJson, 'destinatary') !=
-                null &&
-            functions.getkeyfromjsonstring(
-                    widget!.messageJson, 'destinatary') !=
+                    widget.messageJson, 'destinatary') !=
                 '') {
           _model.desttinatary = functions.getkeyfromjsonstring(
-              widget!.messageJson, 'destinatary');
+              widget.messageJson, 'destinatary');
         } else {
           _model.desttinatary = 'No Destinatary';
         }
 
-        if (functions.getkeyfromjsonstring(widget!.messageJson, 'message') !=
-                null &&
-            functions.getkeyfromjsonstring(widget!.messageJson, 'message') !=
+        if (functions.getkeyfromjsonstring(widget.messageJson, 'message') !=
                 '') {
           _model.message = functions.getkeyfromjsonstring(
-              widget!.messageJson, 'destinatary');
+              widget.messageJson, 'destinatary');
         } else {
           _model.message = 'Empty Message';
         }
 
         _model.date =
-            functions.getkeyfromjsonstring(widget!.messageJson, 'date');
+            functions.getkeyfromjsonstring(widget.messageJson, 'date');
         safeSetState(() {});
       }
     });
@@ -100,7 +89,7 @@ class _MessageWidgetState extends State<MessageWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 1.0),
+      padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 1.0),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -109,7 +98,7 @@ class _MessageWidgetState extends State<MessageWidget> {
             BoxShadow(
               blurRadius: 0.0,
               color: FlutterFlowTheme.of(context).primaryBackground,
-              offset: Offset(
+              offset: const Offset(
                 0.0,
                 1.0,
               ),
@@ -118,7 +107,7 @@ class _MessageWidgetState extends State<MessageWidget> {
           borderRadius: BorderRadius.circular(12.0),
         ),
         child: Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+          padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +116,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                 flex: 4,
                 child: Padding(
                   padding:
-                      EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 12.0, 12.0),
+                      const EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 12.0, 12.0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,7 +129,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                           shape: BoxShape.circle,
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(2.0),
+                          padding: const EdgeInsets.all(2.0),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(40.0),
                             child: Image.network(
@@ -154,7 +143,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                       ),
                       Expanded(
                         child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               12.0, 0.0, 0.0, 0.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
@@ -167,7 +156,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         0.0, 4.0, 0.0, 0.0),
                                     child: Text(
                                       _model.remitent,
@@ -203,13 +192,13 @@ class _MessageWidgetState extends State<MessageWidget> {
                               Container(
                                 width: MediaQuery.sizeOf(context).width * 0.8,
                                 height: double.infinity,
-                                constraints: BoxConstraints(
+                                constraints: const BoxConstraints(
                                   minHeight: 25.0,
                                   maxHeight: 500.0,
                                 ),
                                 decoration: BoxDecoration(
                                   color: FlutterFlowTheme.of(context).accent2,
-                                  borderRadius: BorderRadius.only(
+                                  borderRadius: const BorderRadius.only(
                                     bottomLeft: Radius.circular(15.0),
                                     bottomRight: Radius.circular(15.0),
                                     topLeft: Radius.circular(15.0),
@@ -221,7 +210,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                                   ),
                                 ),
                                 child: Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 4.0, 0.0, 0.0),
                                   child: Text(
                                     _model.message,
@@ -242,7 +231,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0, 4.0, 0.0, 0.0),
                                 child: Text(
                                   _model.desttinatary,
@@ -267,7 +256,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                 ),
               ),
               Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
+                padding: const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
                 child: Container(
                   width: 12.0,
                   height: 12.0,
@@ -275,7 +264,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                     color: FlutterFlowTheme.of(context).secondary,
                     shape: BoxShape.circle,
                   ),
-                  alignment: AlignmentDirectional(0.0, 0.0),
+                  alignment: const AlignmentDirectional(0.0, 0.0),
                 ),
               ),
             ],

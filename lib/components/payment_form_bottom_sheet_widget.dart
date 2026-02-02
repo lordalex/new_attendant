@@ -2,14 +2,12 @@ import 'package:knexattendant/auth/firebase_auth/auth_util.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import 'package:knexattendant/custom_code/actions/index.dart' as actions;
 import 'package:knexattendant/flutter_flow/custom_functions.dart' as functions;
 import 'package:knexattendant/index.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'payment_form_bottom_sheet_model.dart';
 export 'payment_form_bottom_sheet_model.dart';
 
@@ -57,16 +55,16 @@ class _PaymentFormBottomSheetWidgetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
       child: Padding(
-        padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+        padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
             color: FlutterFlowTheme.of(context).secondaryBackground,
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
                 blurRadius: 10.0,
                 color: Color(0x33000000),
@@ -77,7 +75,7 @@ class _PaymentFormBottomSheetWidgetState
                 spreadRadius: 0.0,
               )
             ],
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(0.0),
               bottomRight: Radius.circular(0.0),
               topLeft: Radius.circular(24.0),
@@ -85,12 +83,12 @@ class _PaymentFormBottomSheetWidgetState
             ),
           ),
           child: Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+            padding: const EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -107,7 +105,7 @@ class _PaymentFormBottomSheetWidgetState
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                   child: Text(
                     'Payment Details',
                     textAlign: TextAlign.center,
@@ -121,7 +119,7 @@ class _PaymentFormBottomSheetWidgetState
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -129,7 +127,7 @@ class _PaymentFormBottomSheetWidgetState
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -152,7 +150,7 @@ class _PaymentFormBottomSheetWidgetState
                                     ),
                               ),
                               Text(
-                                widget!.value!,
+                                widget.value!,
                                 style: FlutterFlowTheme.of(context)
                                     .bodyLarge
                                     .override(
@@ -227,7 +225,7 @@ class _PaymentFormBottomSheetWidgetState
                               ),
                               Text(
                                 functions
-                                    .sumStrings(widget!.value,
+                                    .sumStrings(widget.value,
                                         _model.textController.text)
                                     .toString(),
                                 style: FlutterFlowTheme.of(context)
@@ -244,13 +242,13 @@ class _PaymentFormBottomSheetWidgetState
                               ),
                             ],
                           ),
-                        ].divide(SizedBox(height: 12.0)),
+                        ].divide(const SizedBox(height: 12.0)),
                       ),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -267,7 +265,7 @@ class _PaymentFormBottomSheetWidgetState
                             ),
                       ),
                       Stack(
-                        alignment: AlignmentDirectional(1.0, 0.0),
+                        alignment: const AlignmentDirectional(1.0, 0.0),
                         children: [
                           Container(
                             width: double.infinity,
@@ -285,9 +283,9 @@ class _PaymentFormBottomSheetWidgetState
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 Align(
-                                  alignment: AlignmentDirectional(-1.0, 0.0),
+                                  alignment: const AlignmentDirectional(-1.0, 0.0),
                                   child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         6.0, 0.0, 0.0, 0.0),
                                     child: Text(
                                       '\$',
@@ -316,14 +314,14 @@ class _PaymentFormBottomSheetWidgetState
                                 ),
                                 Stack(
                                   children: [
-                                    Container(
+                                    SizedBox(
                                       width: 200.0,
                                       child: TextFormField(
                                         controller: _model.textController,
                                         focusNode: _model.textFieldFocusNode,
                                         onChanged: (_) => EasyDebounce.debounce(
                                           '_model.textController',
-                                          Duration(milliseconds: 20),
+                                          const Duration(milliseconds: 20),
                                           () => safeSetState(() {}),
                                         ),
                                         autofocus: true,
@@ -358,7 +356,7 @@ class _PaymentFormBottomSheetWidgetState
                                                         .labelMediumIsCustom,
                                               ),
                                           enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
+                                            borderSide: const BorderSide(
                                               color: Color(0x00000000),
                                               width: 1.0,
                                             ),
@@ -366,7 +364,7 @@ class _PaymentFormBottomSheetWidgetState
                                                 BorderRadius.circular(8.0),
                                           ),
                                           focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
+                                            borderSide: const BorderSide(
                                               color: Color(0x00000000),
                                               width: 1.0,
                                             ),
@@ -436,7 +434,7 @@ class _PaymentFormBottomSheetWidgetState
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
                                 12.0, 12.0, 12.0, 12.0),
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
@@ -459,12 +457,11 @@ class _PaymentFormBottomSheetWidgetState
                                 ),
                                 Text(
                                   valueOrDefault<String>(
-                                    _model.textController.text == null ||
-                                            _model.textController.text == ''
-                                        ? widget!.value
+                                    _model.textController.text == ''
+                                        ? widget.value
                                         : valueOrDefault<String>(
                                             functions
-                                                .sumStrings(widget!.value,
+                                                .sumStrings(widget.value,
                                                     _model.textController.text)
                                                 .toString(),
                                             '0',
@@ -489,7 +486,7 @@ class _PaymentFormBottomSheetWidgetState
                           ),
                         ],
                       ),
-                    ].divide(SizedBox(height: 16.0)),
+                    ].divide(const SizedBox(height: 16.0)),
                   ),
                 ),
                 Row(
@@ -497,13 +494,13 @@ class _PaymentFormBottomSheetWidgetState
                   children: [
                     Expanded(
                       child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
                             16.0, 0.0, 16.0, 0.0),
                         child: FFButtonWidget(
                           onPressed: () async {
                             _model.payment = await actions.sendjsontourl(
-                              '{\"ticket_number\": ${widget!.ticketNumber}, \"tip\": \"${_model.textController.text}\"}',
-                              currentJwtToken!,
+                              '{\"ticket_number\": ${widget.ticketNumber}, \"tip\": \"${_model.textController.text}\"}',
+                              currentJwtToken,
                               FFAppConstants.setTipURL,
                             );
                             Navigator.pop(context);
@@ -511,15 +508,15 @@ class _PaymentFormBottomSheetWidgetState
                             safeSetState(() {});
                           },
                           text: 'Submit Customer Payment',
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.check_circle,
                             size: 17.0,
                           ),
                           options: FFButtonOptions(
                             width: double.infinity,
                             height: 50.0,
-                            padding: EdgeInsets.all(8.0),
-                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsets.all(8.0),
+                            iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 0.0, 0.0, 0.0),
                             iconColor:
                                 FlutterFlowTheme.of(context).primaryBackground,
@@ -535,7 +532,7 @@ class _PaymentFormBottomSheetWidgetState
                                       .titleSmallIsCustom,
                                 ),
                             elevation: 0.0,
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                               color: Colors.transparent,
                               width: 1.0,
                             ),
@@ -559,10 +556,10 @@ class _PaymentFormBottomSheetWidgetState
                       text: 'Cancel\n',
                       options: FFButtonOptions(
                         height: 46.84,
-                        padding: EdgeInsetsDirectional.fromSTEB(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
                             16.0, 0.0, 16.0, 0.0),
                         iconPadding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                            const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
                         color: FlutterFlowTheme.of(context).primary,
                         textStyle: FlutterFlowTheme.of(context)
                             .titleSmall
@@ -580,7 +577,7 @@ class _PaymentFormBottomSheetWidgetState
                     ),
                   ],
                 ),
-              ].divide(SizedBox(height: 20.0)),
+              ].divide(const SizedBox(height: 20.0)),
             ),
           ),
         ),

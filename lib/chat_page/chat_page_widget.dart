@@ -3,12 +3,8 @@ import 'package:knexattendant/components/messages_widget.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_icon_button.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import 'package:knexattendant/custom_code/actions/index.dart' as actions;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'chat_page_model.dart';
 export 'chat_page_model.dart';
 
@@ -67,7 +63,7 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                       !FlutterFlowTheme.of(context).headlineMediumIsCustom,
                 ),
           ),
-          actions: [],
+          actions: const [],
           centerTitle: false,
           elevation: 2.0,
         ),
@@ -81,7 +77,7 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                 child: wrapWithModel(
                   model: _model.messagesModel,
                   updateCallback: () => safeSetState(() {}),
-                  child: MessagesWidget(),
+                  child: const MessagesWidget(),
                 ),
               ),
               Container(
@@ -94,7 +90,7 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         width: 200.0,
                         child: TextFormField(
                           controller: _model.messageTextTextController,
@@ -123,14 +119,14 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                                       .labelMediumIsCustom,
                                 ),
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: Color(0x00000000),
                                 width: 1.0,
                               ),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: Color(0x00000000),
                                 width: 1.0,
                               ),
@@ -181,7 +177,7 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                       onPressed: () async {
                         _model.responseMessage = await actions.sendjsontourl(
                           '{\"destinatary\": \"\", \"message\": \"${_model.messageTextTextController.text}\"}',
-                          currentJwtToken!,
+                          currentJwtToken,
                           FFAppConstants.postMessage,
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -192,7 +188,7 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                                 color: FlutterFlowTheme.of(context).primaryText,
                               ),
                             ),
-                            duration: Duration(milliseconds: 4000),
+                            duration: const Duration(milliseconds: 4000),
                             backgroundColor:
                                 FlutterFlowTheme.of(context).secondary,
                           ),

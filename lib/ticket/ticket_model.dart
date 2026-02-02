@@ -1,29 +1,7 @@
-import 'package:knexattendant/auth/base_auth_user_provider.dart';
-import 'package:knexattendant/auth/firebase_auth/auth_util.dart';
-import 'package:knexattendant/components/bottom_sheet_edit_data_space/bottom_sheet_edit_data_space_widget.dart';
-import 'package:knexattendant/components/payment_form_bottom_sheet_widget.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_animations.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_icon_button.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
-import 'package:knexattendant/flutter_flow/upload_data.dart';
-import 'dart:math';
-import 'dart:ui';
-import 'package:knexattendant/custom_code/actions/index.dart' as actions;
-import 'package:knexattendant/flutter_flow/custom_functions.dart' as functions;
 import 'package:knexattendant/index.dart';
 import 'ticket_widget.dart' show TicketWidget;
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
-import 'package:provider/provider.dart';
 
 class TicketModel extends FlutterFlowModel<TicketWidget> {
   ///  Local state fields for this page.
@@ -136,8 +114,8 @@ class TicketModel extends FlutterFlowModel<TicketWidget> {
   String? responsepintoticketCompleted;
   // Stores action output result for [Custom Action - sendjsontourl] action in Button widget.
   String? searchResultsTicketInPINCompleted;
-  bool isDataUploading_uploadDataAlw = false;
-  FFUploadedFile uploadedLocalFile_uploadDataAlw =
+  bool isDataUploadingUploadDataAlw = false;
+  FFUploadedFile uploadedLocalFileUploadDataAlw =
       FFUploadedFile(bytes: Uint8List.fromList([]), originalFilename: '');
 
   @override

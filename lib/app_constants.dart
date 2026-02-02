@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 abstract class FFAppConstants {
   /// Base URL for all API endpoints

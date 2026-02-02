@@ -1,18 +1,10 @@
 import 'dart:convert';
-import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:timeago/timeago.dart' as timeago;
-import 'lat_lng.dart';
-import 'place.dart';
-import 'uploaded_file.dart';
-import 'package:knexattendant/auth/firebase_auth/auth_util.dart';
 
 List<String> jsontoArray(String jsonString) {
-  final String _fnName = "jsontoArray";
-  print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: START');
+  const String fnName = "jsontoArray";
+  print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: START');
 
   String printableJsonString;
   if (jsonString.length > 100) {
@@ -22,27 +14,27 @@ List<String> jsontoArray(String jsonString) {
     printableJsonString = '"$jsonString"';
   }
   print(
-    'FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Input jsonString: $printableJsonString',
+    'FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Input jsonString: $printableJsonString',
   );
 
   try {
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Attempting jsonDecode.');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Attempting jsonDecode.');
     final dynamic decodedJson = jsonDecode(jsonString);
     print(
-      'FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: jsonDecode successful. Type: ${decodedJson.runtimeType}.',
+      'FF_CUSTOM_FUNC_DEBUG: $fnName: L4: jsonDecode successful. Type: ${decodedJson.runtimeType}.',
     );
 
     if (decodedJson is! List) {
       print(
-        'FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Decoded JSON is not a List. Actual type: ${decodedJson.runtimeType}. Returning [].',
+        'FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Decoded JSON is not a List. Actual type: ${decodedJson.runtimeType}. Returning [].',
       );
-      print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: END (not a list)');
+      print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: END (not a list)');
       return [];
     }
 
     final List<dynamic> jsonList = decodedJson;
     print(
-      'FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Decoded JSON is a List. Items: ${jsonList.length}.',
+      'FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Decoded JSON is a List. Items: ${jsonList.length}.',
     );
 
     List<String> stringList = jsonList.map((item) {
@@ -56,22 +48,22 @@ List<String> jsontoArray(String jsonString) {
     }).toList();
 
     print(
-      'FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Mapping to List<String> complete. Result size: ${stringList.length}.',
+      'FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Mapping to List<String> complete. Result size: ${stringList.length}.',
     );
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: END (success)');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: END (success)');
     return stringList;
   } catch (e, s) {
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: ERROR CAUGHT.');
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Error Type: ${e.runtimeType}');
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Error: $e');
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Stacktrace: $s');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: ERROR CAUGHT.');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Error Type: ${e.runtimeType}');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Error: $e');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Stacktrace: $s');
 
     String errorMessage = 'Error: $e';
     if (errorMessage.length > 200) {
-      errorMessage = errorMessage.substring(0, 200) + "...";
+      errorMessage = "${errorMessage.substring(0, 200)}...";
     }
 
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: END (error)');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: END (error)');
     return [errorMessage];
   }
 }
@@ -208,7 +200,7 @@ String replaceSubstringCaseInsensitive(
 }
 
 String extractTime(String timeStr) {
-  if (timeStr == null || timeStr.trim().isEmpty) {
+  if (timeStr.trim().isEmpty) {
     print(
       "[INPUT_EVALUATION] ⛔ Input is null or empty. Aborting processing.",
     );
@@ -309,7 +301,7 @@ String extractTime(String timeStr) {
       print("[4/6] Formatting date...");
       String month = DateFormat('MMMM').format(utcDate);
       formattedDate =
-          '${month} '
+          '$month '
           '${utcDate.day}, ${utcDate.year}';
       print("✅ Date formatted: $formattedDate");
     } catch (formatError, stackTrace) {
@@ -584,8 +576,8 @@ double sumStrings(String? str1, String? str2) {
 
   try {
     // Try to parse both strings to double
-    double num1 = double.parse(str1) ?? 0;
-    double num2 = double.parse(str2) ?? 0;
+    double num1 = double.parse(str1);
+    double num2 = double.parse(str2);
 
     // Return the sum of the two numbers
     return num1 + num2;

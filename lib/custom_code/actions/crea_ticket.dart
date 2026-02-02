@@ -1,23 +1,21 @@
 // Automatic FlutterFlow imports
-import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
 // Imports other custom actions
-import 'package:knexattendant/flutter_flow/custom_functions.dart'; // Imports custom functions
-import 'package:flutter/material.dart';
+// Imports custom functions
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class ticketdataResponse {
+class TicketdataResponse {
   final bool success;
   final String message;
   final dynamic data;
   final String? error;
   final int? statusCode;
 
-  ticketdataResponse({
+  TicketdataResponse({
     required this.success,
     required this.message,
     this.data,
@@ -36,17 +34,17 @@ class ticketdataResponse {
 
 // Logging levels with color coding
 enum LogLevel {
-  INFO,
-  WARNING,
-  ERROR;
+  info,
+  warning,
+  error;
 
   String get ansiColor {
     switch (this) {
-      case LogLevel.INFO:
+      case LogLevel.info:
         return '\x1B[32m'; // Green
-      case LogLevel.WARNING:
+      case LogLevel.warning:
         return '\x1B[33m'; // Yellow
-      case LogLevel.ERROR:
+      case LogLevel.error:
         return '\x1B[31m'; // Red
     }
   }
@@ -56,7 +54,7 @@ enum LogLevel {
 void logMessage(LogLevel level, String message) {
   final timestamp = DateTime.now().toIso8601String();
   final prefix = level.toString().split('.').last;
-  final resetColor = '\x1B[0m';
+  const resetColor = '\x1B[0m';
   print('${level.ansiColor}[$timestamp][$prefix] $message$resetColor');
 }
 
@@ -65,7 +63,7 @@ class InputValidator {
   static void validateInputs({
     required String token,
     required String firebaseUrl,
-    required String PIN,
+    required String pin,
   }) {
     if (token.isEmpty) {
       throw ArgumentError('Token cannot be empty');
@@ -73,15 +71,14 @@ class InputValidator {
     if (firebaseUrl.isEmpty) {
       throw ArgumentError('firebase URL cannot be empty');
     }
-    if (PIN.isEmpty) {
+    if (pin.isEmpty) {
       throw ArgumentError('PIN cannot be empty');
     }
-    const ticketdata = {};
     // Validate URL format
     try {
       final uri = Uri.parse(firebaseUrl);
       if (!uri.isAbsolute) {
-        throw FormatException('Invalid firebase URL format');
+        throw const FormatException('Invalid firebase URL format');
       }
     } catch (e) {
       throw FormatException('Invalid URL format: $e');
@@ -92,47 +89,46 @@ class InputValidator {
 Future<String> creaTicket(
   String firebaseUrl,
   String token,
-  String Site,
+  String site,
   String vehicleInfo,
-  String PIN,
+  String pin,
   String mail,
 ) async {
-  logMessage(LogLevel.INFO, 'Starting sendticketdata operation');
+  logMessage(LogLevel.info, 'Starting sendticketdata operation');
   try {
     // Validate inputs
-    const ticketdata = {};
-    logMessage(LogLevel.INFO, 'Validating input parameters');
+    logMessage(LogLevel.info, 'Validating input parameters');
     InputValidator.validateInputs(
       token: token,
       firebaseUrl: firebaseUrl,
-      PIN: PIN,
+      pin: pin,
     );
     final uri = Uri.parse(firebaseUrl);
     // Prepare request with retry mechanism
     print(firebaseUrl);
-    print(Site);
+    print(site);
     final response = await _sendRequestWithRetry(
       uri: uri,
       headers: {'Content-Type': 'application/json'},
       body: {
         'idToken': token,
         "data": {
-          "site": Site.replaceAll('"', ""),
-          "PIN": PIN,
+          "site": site.replaceAll('"', ""),
+          "PIN": pin,
           "mail": mail,
           "vehicleInfo": vehicleInfo,
         },
       },
     );
     // Process response
-    final ticketdataResponse = _processResponse(response);
+    final ticketResponse = _processResponse(response);
     print(response);
-    logMessage(LogLevel.INFO, 'Operation completed successfully');
-    return jsonEncode(ticketdataResponse.toJson());
+    logMessage(LogLevel.info, 'Operation completed successfully');
+    return jsonEncode(ticketResponse.toJson());
   } catch (e) {
-    logMessage(LogLevel.ERROR, 'Error in sendticketdata: $e');
+    logMessage(LogLevel.error, 'Error in sendticketdata: $e');
     return jsonEncode(
-      ticketdataResponse(
+      TicketdataResponse(
         success: false,
         message: 'Operation failed',
         error: e.toString(),
@@ -153,7 +149,7 @@ Future<http.Response> _sendRequestWithRetry({
   while (attempts < maxRetries) {
     try {
       logMessage(
-        LogLevel.INFO,
+        LogLevel.info,
         'Sending HTTP request (attempt ${attempts + 1}/$maxRetries)',
       );
       final response = await http.post(
@@ -168,13 +164,13 @@ Future<http.Response> _sendRequestWithRetry({
       attempts++;
       if (attempts < maxRetries) {
         logMessage(
-          LogLevel.WARNING,
+          LogLevel.warning,
           'Request failed with ${response.statusCode}, retrying...',
         );
         await Future.delayed(retryDelay * attempts);
       }
     } on http.ClientException catch (e) {
-      logMessage(LogLevel.ERROR, 'Network error: $e');
+      logMessage(LogLevel.error, 'Network error: $e');
       attempts++;
       if (attempts >= maxRetries) rethrow;
       await Future.delayed(retryDelay * attempts);
@@ -184,10 +180,10 @@ Future<http.Response> _sendRequestWithRetry({
 }
 
 // Helper function to process HTTP response
-ticketdataResponse _processResponse(http.Response response) {
-  logMessage(LogLevel.INFO, 'Processing response: ${response.statusCode}');
+TicketdataResponse _processResponse(http.Response response) {
+  logMessage(LogLevel.info, 'Processing response: ${response.statusCode}');
   if (response.statusCode >= 200 && response.statusCode < 300) {
-    return ticketdataResponse(
+    return TicketdataResponse(
       success: true,
       message: 'ticketdata updated successfully',
       data: jsonDecode(response.body),
@@ -195,7 +191,7 @@ ticketdataResponse _processResponse(http.Response response) {
     );
   }
 
-  return ticketdataResponse(
+  return TicketdataResponse(
     success: false,
     message: 'Failed to update ticketdata: ${response.reasonPhrase}',
     error: response.body,

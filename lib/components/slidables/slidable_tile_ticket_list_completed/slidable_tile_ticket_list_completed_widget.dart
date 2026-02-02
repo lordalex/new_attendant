@@ -1,16 +1,12 @@
 import 'package:knexattendant/flutter_flow/flutter_flow_animations.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:math';
-import 'dart:ui';
 import 'package:knexattendant/custom_code/actions/index.dart' as actions;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'slidable_tile_ticket_list_completed_model.dart';
 export 'slidable_tile_ticket_list_completed_model.dart';
 
@@ -24,7 +20,7 @@ class SlidableTileTicketListCompletedWidget extends StatefulWidget {
     Color? timeTextColor,
     required this.ticketNumber,
     this.tipAmount,
-  }) : this.timeTextColor = timeTextColor ?? const Color(0xFF57636C);
+  }) : timeTextColor = timeTextColor ?? const Color(0xFF57636C);
 
   final String? plate;
   final String? profileImg;
@@ -60,7 +56,7 @@ class _SlidableTileTicketListCompletedWidgetState
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       _model.clientPhoto = await actions.base64toBytesAction(
-        widget!.profileImg!,
+        widget.profileImg!,
         'clientPhoto',
       );
     });
@@ -74,8 +70,8 @@ class _SlidableTileTicketListCompletedWidgetState
             curve: Curves.elasticOut,
             delay: 0.0.ms,
             duration: 900.0.ms,
-            begin: Offset(0.0, 0.0),
-            end: Offset(-100.0, 0.0),
+            begin: const Offset(0.0, 0.0),
+            end: const Offset(-100.0, 0.0),
           ),
           FadeEffect(
             curve: Curves.easeInOut,
@@ -114,13 +110,13 @@ class _SlidableTileTicketListCompletedWidgetState
                 .forward();
           }
           await Future.delayed(
-            Duration(
+            const Duration(
               milliseconds: 150,
             ),
           );
           await widget.callback?.call();
           FFAppState().isTicketOn = true;
-          FFAppState().ticketNumber = widget!.ticketNumber!;
+          FFAppState().ticketNumber = widget.ticketNumber!;
           safeSetState(() {});
         }
         _model.posx = details.localPosition.dx;
@@ -140,7 +136,7 @@ class _SlidableTileTicketListCompletedWidgetState
               children: [
                 Padding(
                   padding:
-                      EdgeInsetsDirectional.fromSTEB(15.0, 10.0, 15.0, 15.0),
+                      const EdgeInsetsDirectional.fromSTEB(15.0, 10.0, 15.0, 15.0),
                   child: Container(
                     width: 60.0,
                     height: 58.1,
@@ -167,18 +163,18 @@ class _SlidableTileTicketListCompletedWidgetState
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 7.0, 5.0, 7.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0.0, 7.0, 5.0, 7.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 5.0, 0.0, 0.0),
                           child: Container(
                             height: MediaQuery.sizeOf(context).height * 0.071,
                             decoration: BoxDecoration(
-                              color: Color(0x1E131919),
+                              color: const Color(0x1E131919),
                               borderRadius: BorderRadius.circular(5.0),
                               border: Border.all(
                                 color:
@@ -186,10 +182,10 @@ class _SlidableTileTicketListCompletedWidgetState
                               ),
                             ),
                             child: Align(
-                              alignment: AlignmentDirectional(0.0, 0.0),
+                              alignment: const AlignmentDirectional(0.0, 0.0),
                               child: Text(
                                 valueOrDefault<String>(
-                                  widget!.plate,
+                                  widget.plate,
                                   'error',
                                 ),
                                 style: FlutterFlowTheme.of(context)
@@ -223,29 +219,29 @@ class _SlidableTileTicketListCompletedWidgetState
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Align(
-                        alignment: AlignmentDirectional(1.0, 0.0),
+                        alignment: const AlignmentDirectional(1.0, 0.0),
                         child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 0.0, 5.0, 0.0),
                           child: Container(
                             width: 120.0,
-                            decoration: BoxDecoration(),
+                            decoration: const BoxDecoration(),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 FaIcon(
                                   FontAwesomeIcons.solidClock,
-                                  color: widget!.timeTextColor,
+                                  color: widget.timeTextColor,
                                   size: 17.0,
                                 ),
                                 Expanded(
                                   child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         6.0, 0.0, 2.0, 0.0),
                                     child: Text(
                                       valueOrDefault<String>(
-                                        widget!.departureHour,
+                                        widget.departureHour,
                                         '00:00',
                                       ),
                                       textAlign: TextAlign.start,
@@ -259,7 +255,7 @@ class _SlidableTileTicketListCompletedWidgetState
                                                       .bodyMedium
                                                       .fontStyle,
                                             ),
-                                            color: widget!.timeTextColor,
+                                            color: widget.timeTextColor,
                                             fontSize: 21.5,
                                             letterSpacing: 0.0,
                                             fontWeight: FontWeight.w800,
@@ -277,29 +273,29 @@ class _SlidableTileTicketListCompletedWidgetState
                         ),
                       ),
                       Align(
-                        alignment: AlignmentDirectional(1.0, 0.0),
+                        alignment: const AlignmentDirectional(1.0, 0.0),
                         child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 0.0, 5.0, 0.0),
                           child: Container(
                             width: 120.0,
-                            decoration: BoxDecoration(),
+                            decoration: const BoxDecoration(),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 FaIcon(
                                   FontAwesomeIcons.coins,
-                                  color: widget!.timeTextColor,
+                                  color: widget.timeTextColor,
                                   size: 17.0,
                                 ),
                                 Expanded(
                                   child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         6.0, 0.0, 2.0, 0.0),
                                     child: Text(
                                       '\$${valueOrDefault<String>(
-                                        widget!.tipAmount,
+                                        widget.tipAmount,
                                         '0',
                                       )}',
                                       textAlign: TextAlign.start,
@@ -313,7 +309,7 @@ class _SlidableTileTicketListCompletedWidgetState
                                                       .bodyMedium
                                                       .fontStyle,
                                             ),
-                                            color: widget!.timeTextColor,
+                                            color: widget.timeTextColor,
                                             fontSize: 21.5,
                                             letterSpacing: 0.0,
                                             fontWeight: FontWeight.w800,

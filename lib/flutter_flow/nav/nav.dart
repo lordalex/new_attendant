@@ -1,18 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
 import 'package:knexattendant/auth/base_auth_user_provider.dart';
 
 import 'package:knexattendant/main.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
-import 'package:knexattendant/flutter_flow/lat_lng.dart';
-import 'package:knexattendant/flutter_flow/place.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'serialization_util.dart';
 
 import 'package:knexattendant/index.dart';
 
@@ -82,25 +76,25 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
       refreshListenable: appStateNotifier,
       navigatorKey: appNavigatorKey,
       errorBuilder: (context, state) =>
-          appStateNotifier.loggedIn ? NavBarPage() : LoginPageWidget(),
+          appStateNotifier.loggedIn ? const NavBarPage() : const LoginPageWidget(),
       routes: [
         FFRoute(
           name: '_initialize',
           path: '/',
           builder: (context, _) =>
-              appStateNotifier.loggedIn ? NavBarPage() : LoginPageWidget(),
+              appStateNotifier.loggedIn ? const NavBarPage() : const LoginPageWidget(),
         ),
         FFRoute(
           name: LoginPageWidget.routeName,
           path: LoginPageWidget.routePath,
-          builder: (context, params) => LoginPageWidget(),
+          builder: (context, params) => const LoginPageWidget(),
         ),
         FFRoute(
           name: HomePageWidget.routeName,
           path: HomePageWidget.routePath,
           builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'HomePage')
-              : HomePageWidget(),
+              ? const NavBarPage(initialPage: 'HomePage')
+              : const HomePageWidget(),
         ),
         FFRoute(
             name: TicketListWidget.routeName,
@@ -132,22 +126,22 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: ProfileWidget.routeName,
           path: ProfileWidget.routePath,
           builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'Profile')
-              : ProfileWidget(),
+              ? const NavBarPage(initialPage: 'Profile')
+              : const ProfileWidget(),
         ),
         FFRoute(
           name: ChatPageWidget.routeName,
           path: ChatPageWidget.routePath,
           builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'chatPage')
-              : ChatPageWidget(),
+              ? const NavBarPage(initialPage: 'chatPage')
+              : const ChatPageWidget(),
         ),
         FFRoute(
           name: QRCodeWidget.routeName,
           path: QRCodeWidget.routePath,
           builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'QRCode')
-              : QRCodeWidget(),
+              ? const NavBarPage(initialPage: 'QRCode')
+              : const QRCodeWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
@@ -382,7 +376,7 @@ class TransitionInfo {
   final Duration duration;
   final Alignment? alignment;
 
-  static TransitionInfo appDefault() => TransitionInfo(hasTransition: false);
+  static TransitionInfo appDefault() => const TransitionInfo(hasTransition: false);
 }
 
 class RootPageContext {

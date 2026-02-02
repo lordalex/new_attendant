@@ -1,21 +1,9 @@
-import 'package:knexattendant/flutter_flow/flutter_flow_animations.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_timer.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
-import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:math';
-import 'dart:ui';
-import 'package:knexattendant/custom_code/actions/index.dart' as actions;
 import 'package:stop_watch_timer/stop_watch_timer.dart';
-import 'package:styled_divider/styled_divider.dart';
 import 'slidable_tile_ticket_list_arrival_widget.dart'
     show SlidableTileTicketListArrivalWidget;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 class SlidableTileTicketListArrivalModel
     extends FlutterFlowModel<SlidableTileTicketListArrivalWidget> {

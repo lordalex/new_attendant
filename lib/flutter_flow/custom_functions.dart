@@ -8,7 +8,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'lat_lng.dart';
 import 'place.dart';
 import 'uploaded_file.dart';
-import '/auth/firebase_auth/auth_util.dart';
+import 'package:knexattendant/auth/firebase_auth/auth_util.dart';
 
 List<String> jsontoArray(String jsonString) {
   final String _fnName = "jsontoArray";

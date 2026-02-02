@@ -5,16 +5,16 @@ import 'package:go_router/go_router.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
-import '/auth/base_auth_user_provider.dart';
+import 'package:knexattendant/auth/base_auth_user_provider.dart';
 
-import '/main.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/lat_lng.dart';
-import '/flutter_flow/place.dart';
-import '/flutter_flow/flutter_flow_util.dart';
+import 'package:knexattendant/main.dart';
+import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
+import 'package:knexattendant/flutter_flow/lat_lng.dart';
+import 'package:knexattendant/flutter_flow/place.dart';
+import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
 import 'serialization_util.dart';
 
-import '/index.dart';
+import 'package:knexattendant/index.dart';
 
 export 'package:go_router/go_router.dart';
 export 'serialization_util.dart';

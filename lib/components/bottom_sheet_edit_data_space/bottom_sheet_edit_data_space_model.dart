@@ -1,11 +1,11 @@
-import '/auth/firebase_auth/auth_util.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
+import 'package:knexattendant/auth/firebase_auth/auth_util.dart';
+import 'package:knexattendant/flutter_flow/flutter_flow_icon_button.dart';
+import 'package:knexattendant/flutter_flow/flutter_flow_theme.dart';
+import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
+import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
-import '/custom_code/actions/index.dart' as actions;
-import '/index.dart';
+import 'package:knexattendant/custom_code/actions/index.dart' as actions;
+import 'package:knexattendant/index.dart';
 import 'bottom_sheet_edit_data_space_widget.dart'
     show BottomSheetEditDataSpaceWidget;
 import 'package:flutter/material.dart';

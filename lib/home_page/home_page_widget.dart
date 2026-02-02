@@ -5,6 +5,7 @@ import 'package:knexattendant/flutter_flow/flutter_flow_util.dart';
 import 'package:knexattendant/flutter_flow/flutter_flow_widgets.dart';
 import 'package:knexattendant/flutter_flow/instant_timer.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 import 'package:knexattendant/custom_code/actions/index.dart' as actions;
@@ -44,6 +45,33 @@ class _HomePageWidgetState extends State<HomePageWidget>
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
+      // Fetch user profile to get companyId
+      try {
+        print('DEBUG: Fetching user profile from ${FFAppConstants.getUserURL}');
+        String userProfileJson = await actions.sendjsontourl(
+          '{}',
+          currentJwtToken!,
+          FFAppConstants.getUserURL,
+        );
+        print('DEBUG: User profile response: $userProfileJson');
+        final userProfile = jsonDecode(userProfileJson);
+        if (userProfile != null &&
+            userProfile['data'] != null &&
+            userProfile['data']['companyId'] != null) {
+          FFAppState().companyId = userProfile['data']['companyId'].toString();
+          print(
+              'DEBUG: Set companyId from data.companyId: ${FFAppState().companyId}');
+        } else if (userProfile != null && userProfile['companyId'] != null) {
+          FFAppState().companyId = userProfile['companyId'].toString();
+          print(
+              'DEBUG: Set companyId from companyId: ${FFAppState().companyId}');
+        } else {
+          print('DEBUG: companyId not found in user profile');
+        }
+      } catch (e) {
+        print('Error fetching/parsing user profile: $e');
+      }
+
       unawaited(
         () async {
           await actions.lockOrientation();

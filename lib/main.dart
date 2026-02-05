@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'auth/firebase_auth/firebase_user_provider.dart';
@@ -15,6 +18,23 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoRouter.optionURLReflectsImperativeAPIs = true;
 
+  // Allow Google Fonts to fetch fonts at runtime
+  GoogleFonts.config.allowRuntimeFetching = true;
+
+  // Suppress Google Fonts AssetManifest.json errors in debug mode
+  // These errors occur because google_fonts checks for bundled fonts first,
+  // but the asset manifest may not be available during hot reload on iOS.
+  // The fonts still load correctly from the network.
+  FlutterError.onError = (FlutterErrorDetails details) {
+    final String exceptionStr = details.exception.toString();
+    if (exceptionStr.contains('AssetManifest.json') ||
+        exceptionStr.contains('google_fonts')) {
+      // Silently ignore google_fonts asset manifest errors
+      return;
+    }
+    FlutterError.presentError(details);
+  };
+
   await initFirebase();
 
   // Validate existing session - auto signs out if invalid
@@ -23,10 +43,26 @@ void main() async {
   final appState = FFAppState(); // Initialize FFAppState
   await appState.initializePersistedState();
 
-  runApp(ChangeNotifierProvider(
-    create: (context) => appState,
-    child: const MyApp(),
-  ));
+  // Run app in a guarded zone to suppress google_fonts async errors
+  runZonedGuarded(
+    () {
+      runApp(ChangeNotifierProvider(
+        create: (context) => appState,
+        child: const MyApp(),
+      ));
+    },
+    (error, stackTrace) {
+      final String errorStr = error.toString();
+      // Silently ignore google_fonts AssetManifest.json errors
+      if (errorStr.contains('AssetManifest.json') ||
+          errorStr.contains('google_fonts')) {
+        return;
+      }
+      // Log other errors
+      debugPrint('Uncaught error: $error');
+      debugPrint('Stack trace: $stackTrace');
+    },
+  );
 }
 
 class MyApp extends StatefulWidget {

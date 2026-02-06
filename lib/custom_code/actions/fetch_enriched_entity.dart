@@ -1,14 +1,10 @@
 // Automatic FlutterFlow imports
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'index.dart'; // Imports other custom actions
-import '/flutter_flow/custom_functions.dart'; // Imports custom functions
-import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import '../../services/http_request_manager.dart';
 
 Future<String> fetchEnrichedEntity(
   String openapiJsonUrl,
@@ -18,20 +14,26 @@ Future<String> fetchEnrichedEntity(
   String value,
   String idToken,
 ) async {
-  // Add your function code here!
+  _log('Starting for $modelName.$property=$value');
+  
   try {
     // 1. Fetch OpenAPI JSON
-    final openapiJsonResponse = await http.get(Uri.parse(openapiJsonUrl));
+    final openapiJsonResponse = await HttpRequestManager().get(
+      uri: Uri.parse(openapiJsonUrl),
+      priority: RequestPriority.background,
+      description: 'fetchOpenAPI',
+    );
+    
     if (openapiJsonResponse.statusCode != 200) {
-      print('Failed to fetch OpenAPI JSON: ${openapiJsonResponse.statusCode}');
+      _log('Failed to fetch OpenAPI JSON: ${openapiJsonResponse.statusCode}');
       return "{}";
     }
-    final openapiJson =
-        jsonDecode(openapiJsonResponse.body) as Map<String, dynamic>;
+    
+    final openapiJson = jsonDecode(openapiJsonResponse.body) as Map<String, dynamic>;
 
     // 2. Construct Search Request Body for initial search
     final searchRequestBody = {
-      "idToken": idToken, // Include idToken in the request body
+      "idToken": idToken,
       "data": {
         "modelName": modelName,
         "searchCriteria": {property: value},
@@ -39,45 +41,40 @@ Future<String> fetchEnrichedEntity(
     };
 
     // 3. Make Initial Search Request
-    final searchResponse = await http.post(
-      Uri.parse('$url/search'), // Assuming /search is the endpoint
+    final searchResponse = await HttpRequestManager().post(
+      uri: Uri.parse('$url/search'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(searchRequestBody),
+      body: searchRequestBody,
+      priority: RequestPriority.normal,
+      description: 'searchEntity: $modelName',
     );
 
     if (searchResponse.statusCode != 200) {
-      print(
-        'Initial search failed: ${searchResponse.statusCode}, body: ${searchResponse.body}',
-      );
-      return "{}"; // Or handle error based on response body
-    }
-
-    final searchResult =
-        jsonDecode(searchResponse.body) as Map<String, dynamic>;
-    if (searchResult['results'] == null ||
-        (searchResult['results'] as List).isEmpty) {
-      print('No results found for initial search.');
+      _log('Initial search failed: ${searchResponse.statusCode}');
       return "{}";
     }
 
-    Map<String, dynamic> entity =
-        (searchResult['results'] as List).first as Map<String, dynamic>;
+    final searchResult = jsonDecode(searchResponse.body) as Map<String, dynamic>;
+    if (searchResult['results'] == null || (searchResult['results'] as List).isEmpty) {
+      _log('No results found for initial search');
+      return "{}";
+    }
+
+    Map<String, dynamic> entity = (searchResult['results'] as List).first as Map<String, dynamic>;
 
     // 4. Resolve Schema Relationships (nested function)
     Future<Map<String, dynamic>> resolveRelationships(
       Map<String, dynamic> entity,
       Map<String, dynamic> openapiJson,
       String baseUrl,
-      String idToken, // Pass idToken to nested function
+      String idToken,
     ) async {
       String? getModelNameFromRef(String ref) {
         final parts = ref.split('/');
-        if (parts.length == 4 &&
-            parts[1] == 'components' &&
-            parts[2] == 'schemas') {
+        if (parts.length == 4 && parts[1] == 'components' && parts[2] == 'schemas') {
           return parts[3];
         }
-        return null; // Return null when model name cannot be extracted
+        return null;
       }
 
       String? getEntitySchemaNameFromRef(String? ref) {
@@ -89,56 +86,45 @@ Future<String> fetchEnrichedEntity(
         String baseUrl,
         String relatedModelName,
         String relatedId,
-        String idToken, // Pass idToken to nested function
+        String idToken,
       ) async {
         final relatedSearchRequestBody = {
-          "idToken":
-              idToken, // Include idToken in the request body for related entity search
+          "idToken": idToken,
           "data": {
             "modelName": relatedModelName,
-            "searchCriteria": {
-              "id": relatedId,
-            }, // Assuming related entities are searched by 'id'
+            "searchCriteria": {"id": relatedId},
           },
         };
 
-        final relatedSearchResponse = await http.post(
-          Uri.parse('$baseUrl/search'), // Use the same /search endpoint
+        final relatedSearchResponse = await HttpRequestManager().post(
+          uri: Uri.parse('$baseUrl/search'),
           headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(relatedSearchRequestBody),
+          body: relatedSearchRequestBody,
+          priority: RequestPriority.background, // Related entity fetches are background
+          description: 'fetchRelated: $relatedModelName',
         );
 
         if (relatedSearchResponse.statusCode != 200) {
-          print(
-            'Failed to fetch related entity ($relatedModelName with id: $relatedId): ${relatedSearchResponse.statusCode}, body: ${relatedSearchResponse.body}',
-          );
+          _log('Failed to fetch related entity ($relatedModelName): ${relatedSearchResponse.statusCode}');
           return null;
         }
 
-        final relatedSearchResult =
-            jsonDecode(relatedSearchResponse.body) as Map<String, dynamic>;
-        if (relatedSearchResult['results'] == null ||
-            (relatedSearchResult['results'] as List).isEmpty) {
-          print(
-            'No results found for related entity ($relatedModelName with id: $relatedId).',
-          );
+        final relatedSearchResult = jsonDecode(relatedSearchResponse.body) as Map<String, dynamic>;
+        if (relatedSearchResult['results'] == null || (relatedSearchResult['results'] as List).isEmpty) {
+          _log('No results for related entity ($relatedModelName)');
           return null;
         }
-        return (relatedSearchResult['results'] as List).first
-            as Map<String, dynamic>;
+        return (relatedSearchResult['results'] as List).first as Map<String, dynamic>;
       }
 
-      final componentsSchemas =
-          openapiJson['components']['schemas'] as Map<String, dynamic>;
-      final entitySchemaName = getEntitySchemaNameFromRef(
-        entity['\$ref']?.toString(),
-      ); // If entity itself is a ref
+      final componentsSchemas = openapiJson['components']['schemas'] as Map<String, dynamic>;
+      final entitySchemaName = getEntitySchemaNameFromRef(entity['\$ref']?.toString());
       Map<String, dynamic>? schema = entitySchemaName != null
           ? componentsSchemas[entitySchemaName] as Map<String, dynamic>?
           : null;
 
       if (schema == null) {
-        //Try to find the schema based on the type of entity we are processing, assuming entity is Ticket in the first call
+        // Try to find the schema based on the type of entity
         String currentSchemaName = '';
         if (entity.containsKey('ticket_number')) {
           currentSchemaName = 'Ticket';
@@ -149,8 +135,7 @@ Future<String> fetchEnrichedEntity(
           if (entity.containsKey('photoURL')) {
             currentSchemaName = 'UserClient';
           } else if (entity.containsKey('status') &&
-              (entity['status'] == 'active' ||
-                  entity['status'] == 'inactive')) {
+              (entity['status'] == 'active' || entity['status'] == 'inactive')) {
             currentSchemaName = 'UserAttendant';
           }
         } else if (entity.containsKey('vehicle_make') &&
@@ -160,66 +145,57 @@ Future<String> fetchEnrichedEntity(
         }
 
         if (currentSchemaName.isNotEmpty) {
-          schema =
-              componentsSchemas[currentSchemaName] as Map<String, dynamic>?;
+          schema = componentsSchemas[currentSchemaName] as Map<String, dynamic>?;
         }
         if (schema == null) {
-          return entity; // If schema not found, return entity as is
+          return entity;
         }
       }
 
       for (final propertyName in entity.keys) {
-        if (entity[propertyName] is String &&
-            (entity[propertyName] as String).isNotEmpty) {
+        if (entity[propertyName] is String && (entity[propertyName] as String).isNotEmpty) {
           final propertySchema = schema['properties'][propertyName];
           if (propertySchema != null && propertySchema['\$ref'] != null) {
             final ref = propertySchema['\$ref'].toString();
             final relatedModelName = getModelNameFromRef(ref);
             if (relatedModelName != null) {
-              final relatedId =
-                  entity[propertyName]; // Assuming ID is directly the value
+              final relatedId = entity[propertyName];
 
               if (relatedId != null && relatedId.toString().isNotEmpty) {
                 final relatedEntity = await fetchRelatedEntity(
                   baseUrl,
                   relatedModelName,
                   relatedId.toString(),
-                  idToken, // Pass idToken to fetchRelatedEntity
+                  idToken,
                 );
                 if (relatedEntity != null) {
                   entity[propertyName] = relatedEntity;
                   await resolveRelationships(
-                    // Recursively resolve relationships for the related entity
                     entity[propertyName] as Map<String, dynamic>,
                     openapiJson,
                     baseUrl,
-                    idToken, // Pass idToken for recursive calls
+                    idToken,
                   );
                 }
               }
             }
           }
-        } else if (entity[propertyName] is Map<String, dynamic>) {
-          // Handle nested objects, although in this schema, direct refs are strings
-          // If you have nested object refs in your real schema, you might need to recursively call resolveRelationships here as well.
-        } else if (entity[propertyName] is List) {
-          // Handle lists if needed, for example if parkingSpace or lockerSpace were lists of refs
-          // In this schema, parkingSpace and lockerSpace are complex objects already.
         }
       }
       return entity;
     }
 
-    final enrichedEntity = await resolveRelationships(
-      entity,
-      openapiJson,
-      url,
-      idToken, // Pass idToken to resolveRelationships
-    );
-
-    return jsonEncode(enrichedEntity); // Return JSON string
+    final enrichedEntity = await resolveRelationships(entity, openapiJson, url, idToken);
+    
+    _log('Completed');
+    return jsonEncode(enrichedEntity);
   } catch (e) {
-    print('Error in fetchEnrichedEntity: $e');
+    _log('Error: $e');
     return "{}";
   }
+}
+
+// Simplified logging
+void _log(String message) {
+  print('[fetchEnrichedEntity] $message');
 }

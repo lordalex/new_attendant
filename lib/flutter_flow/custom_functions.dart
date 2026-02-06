@@ -95,14 +95,38 @@ String getkeyfromjsonstring(String string, String key) {
   try {
     final dynamic jsonData = jsonDecode(string);
 
+    // Helper function to convert camelCase to snake_case
+    String camelToSnake(String input) {
+      return input.replaceAllMapped(
+        RegExp(r'([A-Z])'),
+        (match) => '_${match.group(0)!.toLowerCase()}',
+      );
+    }
+
+    // Helper function to check if two keys match (case-insensitive, camel/snake agnostic)
+    bool keysMatch(String key1, String key2) {
+      if (key1.toLowerCase() == key2.toLowerCase()) return true;
+      if (camelToSnake(key1).toLowerCase() == camelToSnake(key2).toLowerCase())
+        return true;
+      return false;
+    }
+
     // Recursive function to find the key
     // This function is defined above the "MODIFY CODE ONLY BELOW THIS LINE" marker in the original problem structure,
     // so it's assumed to be outside the modification scope for this request.
     // It's included here for completeness of the `getkeyfromjsonstring` function.
     dynamic findKeyRecursively(dynamic currentJson, String targetKey) {
       if (currentJson is Map<String, dynamic>) {
+        // First try exact match
         if (currentJson.containsKey(targetKey)) {
           return currentJson[targetKey];
+        }
+        // Then try case-insensitive and snake_case/camelCase matching
+        for (final entry in currentJson.entries) {
+          if (keysMatch(entry.key, targetKey)) {
+            print("Found matching key: '${entry.key}' for target '$targetKey'");
+            return entry.value;
+          }
         }
         for (final value in currentJson.values) {
           final dynamic result = findKeyRecursively(value, targetKey);
@@ -118,6 +142,9 @@ String getkeyfromjsonstring(String string, String key) {
             // The provided original code for recursion is: `if (result != null) return result;`
             // Sticking to that simplicity: if a search in a branch yields a non-null value, it's found.
             // If the direct key lookup `currentJson[targetKey]` yields `null`, that `null` is returned.
+            // Added check: If the specific key whose value is null is found, this path might not be hit if we rely on result!=null
+            // Let's assume the original recursive function implies that if currentJson[targetKey] is null, it's a valid found value (null).
+            // The original structure seems robust for finding values, including nulls.
             if (result != null) {
               return result;
             }
@@ -196,6 +223,134 @@ String getkeyfromjsonstring(String string, String key) {
   }
 }
 
+String convertFirestoreTimestampToIso(String firestoreTimestampJson) {
+  print("Converting Firestore timestamp: $firestoreTimestampJson");
+
+  if (firestoreTimestampJson.trim().isEmpty) {
+    print("Empty timestamp input");
+    return "";
+  }
+
+  try {
+    // Check if it's already a plain date string (not Firestore format)
+    if (!firestoreTimestampJson.contains('_seconds')) {
+      // Might already be an ISO date string
+      return firestoreTimestampJson.replaceAll('"', '');
+    }
+
+    // Parse the Firestore timestamp JSON
+    final dynamic timestampData = jsonDecode(firestoreTimestampJson);
+
+    if (timestampData is! Map<String, dynamic>) {
+      print("Timestamp is not a Map: ${timestampData.runtimeType}");
+      return "";
+    }
+
+    // Extract seconds and nanoseconds
+    final int seconds =
+        timestampData['_seconds'] ?? timestampData['seconds'] ?? 0;
+    final int nanoseconds =
+        timestampData['_nanoseconds'] ?? timestampData['nanoseconds'] ?? 0;
+
+    if (seconds == 0) {
+      print("No seconds found in timestamp");
+      return "";
+    }
+
+    // Convert to milliseconds
+    final int milliseconds = (seconds * 1000) + (nanoseconds ~/ 1000000);
+
+    // Create DateTime and convert to ISO string
+    final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(milliseconds);
+    final String isoString = dateTime.toIso8601String();
+
+    print("Converted to ISO: $isoString");
+    return isoString;
+  } catch (e) {
+    print("Error converting Firestore timestamp: $e");
+    // If parsing fails, try returning the input as-is (might already be a date string)
+    return firestoreTimestampJson.replaceAll('"', '');
+  }
+}
+
+String getTimeDifferenceFromTicket(String ticketJson) {
+  print("=== getTimeDifferenceFromTicket START ===");
+  print(
+      "Input ticket JSON (first 100 chars): ${ticketJson.length > 100 ? ticketJson.substring(0, 100) + '...' : ticketJson}");
+
+  try {
+    // Step 1: Get the created_at timestamp from the ticket
+    final String timestampJson = getkeyfromjsonstring(ticketJson, "created_at");
+    print("Step 1 - Timestamp JSON: $timestampJson");
+
+    if (timestampJson.isEmpty) {
+      print("No timestamp found, returning empty");
+      return "";
+    }
+
+    // Step 2: Convert Firestore timestamp to ISO date string
+    final String isoDate = convertFirestoreTimestampToIso(timestampJson);
+    print("Step 2 - ISO Date: $isoDate");
+
+    if (isoDate.isEmpty) {
+      print("Failed to convert timestamp, returning empty");
+      return "";
+    }
+
+    // Step 3: Extract time information
+    final String timeInfoJson = extractTime(isoDate);
+    print("Step 3 - Time Info: $timeInfoJson");
+
+    // Step 4: Get the time_difference from the result
+    final String timeDifference =
+        getkeyfromjsonstring(timeInfoJson, "time_difference");
+    print("Step 4 - Time Difference: $timeDifference");
+
+    print("=== getTimeDifferenceFromTicket END ===");
+    return timeDifference.replaceAll('"', ''); // Remove quotes from the result
+  } catch (e) {
+    print("Error in getTimeDifferenceFromTicket: $e");
+    return "";
+  }
+}
+
+String getClientPhotoFromTicket(String ticketJson) {
+  print("=== getClientPhotoFromTicket START ===");
+
+  if (ticketJson.isEmpty) {
+    print("Empty ticket JSON");
+    return "";
+  }
+
+  try {
+    // Try common variations of the photo field name
+    List<String> possibleKeys = [
+      "clientPhoto",
+      "client_photo",
+      "client_photo_url",
+      "photo",
+      "image",
+      "clientImage",
+      "client_image"
+    ];
+
+    for (String key in possibleKeys) {
+      final String value = getkeyfromjsonstring(ticketJson, key);
+      if (value.isNotEmpty && value != "" && value != "error") {
+        print("Found photo with key: $key");
+        // Remove quotes if present
+        return value.replaceAll('"', '');
+      }
+    }
+
+    print("No client photo found in ticket");
+    return "";
+  } catch (e) {
+    print("Error in getClientPhotoFromTicket: $e");
+    return "";
+  }
+}
+
 String replaceSubstringCaseInsensitive(
   String original,
   String oldSubstr,
@@ -205,6 +360,81 @@ String replaceSubstringCaseInsensitive(
     RegExp(oldSubstr, caseSensitive: false),
     newSubstr,
   );
+}
+
+bool hasValidClientPhoto(String ticketJson) {
+  if (ticketJson.isEmpty) return false;
+
+  try {
+    final String photoUrl = getClientPhotoFromTicket(ticketJson);
+    return photoUrl.isNotEmpty &&
+        photoUrl != "error" &&
+        !photoUrl.contains("placeholder") &&
+        photoUrl.length > 10; // Minimum length for a valid URL/base64
+  } catch (e) {
+    return false;
+  }
+}
+
+String getVehicleIdFromTicket(String ticketJson) {
+  if (ticketJson.isEmpty) return "";
+
+  try {
+    // Extract the vehicle ID from the ticket
+    final String vehicleId = getkeyfromjsonstring(ticketJson, "vehicle");
+    return vehicleId.replaceAll('"', '');
+  } catch (e) {
+    return "";
+  }
+}
+
+String getVehicleInfoFromTicket(String ticketJson) {
+  // This is kept for backward compatibility
+  // Use getVehicleIdFromTicket() to get the ID, then call fetchVehicleDetails action
+  return getVehicleIdFromTicket(ticketJson);
+}
+
+String formatVehicleDisplay(String vehicleJson) {
+  // Formats vehicle data into a nice display string
+  // Input: VehicleData JSON from API
+  // Output: "2023 Toyota Camry - Silver (CA-ABC123)"
+
+  if (vehicleJson.isEmpty) {
+    return "Vehicle info unavailable";
+  }
+
+  try {
+    final String year =
+        getkeyfromjsonstring(vehicleJson, "vehicle_year").replaceAll('"', '');
+    final String make =
+        getkeyfromjsonstring(vehicleJson, "vehicle_make").replaceAll('"', '');
+    final String model =
+        getkeyfromjsonstring(vehicleJson, "vehicle_model").replaceAll('"', '');
+    final String color =
+        getkeyfromjsonstring(vehicleJson, "color").replaceAll('"', '');
+    final String plate =
+        getkeyfromjsonstring(vehicleJson, "license_plate").replaceAll('"', '');
+
+    List<String> parts = [];
+    if (year.isNotEmpty) parts.add(year);
+    if (make.isNotEmpty && make != "Unknown Make") parts.add(make);
+    if (model.isNotEmpty && model != "Unknown Model") parts.add(model);
+
+    String vehicleDesc = parts.join(" ");
+
+    if (color.isNotEmpty && color != "Unknown Color") {
+      vehicleDesc += " - $color";
+    }
+
+    if (plate.isNotEmpty) {
+      vehicleDesc += " ($plate)";
+    }
+
+    return vehicleDesc.isEmpty ? "Vehicle info unavailable" : vehicleDesc;
+  } catch (e) {
+    print("Error formatting vehicle display: $e");
+    return "Vehicle info unavailable";
+  }
 }
 
 String extractTime(String timeStr) {
@@ -221,7 +451,7 @@ String extractTime(String timeStr) {
   }
   try {
     String
-    stringToParse; // This will hold the actual date string to be processed.
+        stringToParse; // This will hold the actual date string to be processed.
 
     // Step 1: Determine the actual date string (stringToParse) from timeStr.
     // This handles the two scenarios: timeStr is JSON-encoded string, or timeStr is a direct string.
@@ -236,6 +466,53 @@ String extractTime(String timeStr) {
         print(
           "[INPUT_EVALUATION] ✅ Input is a JSON-encoded string. Using decoded value: \"$stringToParse\"",
         );
+      } else if (decodedJson is Map<String, dynamic>) {
+        // Check if it's a Firestore timestamp format
+        if (decodedJson.containsKey('_seconds') ||
+            decodedJson.containsKey('seconds')) {
+          print(
+            "[INPUT_EVALUATION] ✅ Input is a Firestore timestamp. Converting to ISO date.",
+          );
+          final int seconds =
+              decodedJson['_seconds'] ?? decodedJson['seconds'] ?? 0;
+          final int nanoseconds =
+              decodedJson['_nanoseconds'] ?? decodedJson['nanoseconds'] ?? 0;
+
+          if (seconds > 0) {
+            final int milliseconds =
+                (seconds * 1000) + (nanoseconds ~/ 1000000);
+            final DateTime dateTime =
+                DateTime.fromMillisecondsSinceEpoch(milliseconds);
+            stringToParse = dateTime.toIso8601String();
+            print(
+              "[INPUT_EVALUATION] ✅ Converted Firestore timestamp to ISO: \"$stringToParse\"",
+            );
+          } else {
+            print(
+              "[INPUT_EVALUATION] ⛔ Firestore timestamp has invalid seconds value.",
+            );
+            return jsonEncode({
+              'error': 'INVALID_FIRESTORE_TIMESTAMP',
+              'message':
+                  'Firestore timestamp has invalid or zero seconds value.',
+              'original_input': timeStr,
+              'stage': 'input_evaluation',
+            });
+          }
+        } else {
+          // It's a Map but not a Firestore timestamp
+          print(
+            "[INPUT_EVALUATION] ⛔ Input decoded as JSON Map, but not a Firestore timestamp. Original input: \"$timeStr\"",
+          );
+          return jsonEncode({
+            'error': 'INVALID_JSON_CONTENT_TYPE',
+            'message':
+                'Input was JSON Map, but not a valid Firestore timestamp.',
+            'original_input': timeStr,
+            'decoded_value_type': decodedJson.runtimeType.toString(),
+            'stage': 'input_evaluation',
+          });
+        }
       } else {
         // Input is valid JSON, but not a string (e.g. "123", "true", "{}").
         // This is an invalid format for a date string.
@@ -308,8 +585,7 @@ String extractTime(String timeStr) {
     try {
       print("[4/6] Formatting date...");
       String month = DateFormat('MMMM').format(utcDate);
-      formattedDate =
-          '${month} '
+      formattedDate = '${month} '
           '${utcDate.day}, ${utcDate.year}';
       print("✅ Date formatted: $formattedDate");
     } catch (formatError, stackTrace) {
@@ -332,8 +608,7 @@ String extractTime(String timeStr) {
       final period = hour >= 12 ? 'PM' : 'AM';
       final twelveHour = hour % 12 == 0 ? 12 : hour % 12;
 
-      formattedTime =
-          '${twelveHour.toString().padLeft(2, '0')}:'
+      formattedTime = '${twelveHour.toString().padLeft(2, '0')}:'
           '${utcDate.minute.toString().padLeft(2, '0')} $period';
       print("✅ Time formatted: $formattedTime");
     } catch (formatError, stackTrace) {
@@ -360,8 +635,7 @@ String extractTime(String timeStr) {
       final minutes = difference.inMinutes % 60;
       final seconds = difference.inSeconds % 60;
 
-      timeDifference =
-          '${days.toString().padLeft(2, '0')}d '
+      timeDifference = '${days.toString().padLeft(2, '0')}d '
           '${hours.toString().padLeft(2, '0')}h '
           '${minutes.toString().padLeft(2, '0')}m '
           '${seconds.toString().padLeft(2, '0')}s';
@@ -524,8 +798,7 @@ int stringDateToMillisecondsInt(String? stringDate) {
     int minutes = int.parse(parts[2].replaceAll('m', ''));
     int seconds = int.parse(parts[3].replaceAll('s', ''));
 
-    int totalMilliseconds =
-        days * 24 * 60 * 60 * 1000 +
+    int totalMilliseconds = days * 24 * 60 * 60 * 1000 +
         hours * 60 * 60 * 1000 +
         minutes * 60 * 1000 +
         seconds * 1000;

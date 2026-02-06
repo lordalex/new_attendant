@@ -1,14 +1,11 @@
 // Automatic FlutterFlow imports
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-// Imports other custom actions
-import '/flutter_flow/custom_functions.dart'; // Imports custom functions
-import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../services/http_request_manager.dart';
 
 class ticketdataResponse {
   final bool success;
@@ -34,30 +31,9 @@ class ticketdataResponse {
   };
 }
 
-// Logging levels with color coding
-enum LogLevel {
-  INFO,
-  WARNING,
-  ERROR;
-
-  String get ansiColor {
-    switch (this) {
-      case LogLevel.INFO:
-        return '\x1B[32m'; // Green
-      case LogLevel.WARNING:
-        return '\x1B[33m'; // Yellow
-      case LogLevel.ERROR:
-        return '\x1B[31m'; // Red
-    }
-  }
-}
-
-// Enhanced logging function
-void logMessage(LogLevel level, String message) {
-  final timestamp = DateTime.now().toIso8601String();
-  final prefix = level.toString().split('.').last;
-  final resetColor = '\x1B[0m';
-  print('${level.ansiColor}[$timestamp][$prefix] $message$resetColor');
+// Simplified logging
+void _log(String message) {
+  print('[creaTicket] $message');
 }
 
 // Input validation class
@@ -76,7 +52,7 @@ class InputValidator {
     if (PIN.isEmpty) {
       throw ArgumentError('PIN cannot be empty');
     }
-    const ticketdata = {};
+
     // Validate URL format
     try {
       final uri = Uri.parse(firebaseUrl);
@@ -97,22 +73,17 @@ Future<String> creaTicket(
   String PIN,
   String mail,
 ) async {
-  logMessage(LogLevel.INFO, 'Starting sendticketdata operation');
+  _log('Starting');
   try {
     // Validate inputs
-    const ticketdata = {};
-    logMessage(LogLevel.INFO, 'Validating input parameters');
     InputValidator.validateInputs(
       token: token,
       firebaseUrl: firebaseUrl,
       PIN: PIN,
     );
-    final uri = Uri.parse(firebaseUrl);
-    // Prepare request with retry mechanism
-    print(firebaseUrl);
-    print(Site);
-    final response = await _sendRequestWithRetry(
-      uri: uri,
+
+    final response = await HttpRequestManager().post(
+      uri: Uri.parse(firebaseUrl),
       headers: {'Content-Type': 'application/json'},
       body: {
         'idToken': token,
@@ -123,14 +94,16 @@ Future<String> creaTicket(
           "vehicleInfo": vehicleInfo,
         },
       },
+      priority: RequestPriority.critical, // Ticket creation is critical
+      description: 'creaTicket: $Site',
+      timeout: const Duration(seconds: 30),
     );
-    // Process response
-    final ticketdataResponse = _processResponse(response);
-    print(response);
-    logMessage(LogLevel.INFO, 'Operation completed successfully');
-    return jsonEncode(ticketdataResponse.toJson());
+
+    final result = _processResponse(response);
+    _log('Completed: ${result.success ? "success" : "failed"}');
+    return jsonEncode(result.toJson());
   } catch (e) {
-    logMessage(LogLevel.ERROR, 'Error in sendticketdata: $e');
+    _log('Error: $e');
     return jsonEncode(
       ticketdataResponse(
         success: false,
@@ -141,51 +114,8 @@ Future<String> creaTicket(
   }
 }
 
-// Helper function to send request with retry mechanism
-Future<http.Response> _sendRequestWithRetry({
-  required Uri uri,
-  required Map<String, String> headers,
-  required Map<String, dynamic> body,
-  int maxRetries = 3,
-  Duration retryDelay = const Duration(seconds: 1),
-}) async {
-  int attempts = 0;
-  while (attempts < maxRetries) {
-    try {
-      logMessage(
-        LogLevel.INFO,
-        'Sending HTTP request (attempt ${attempts + 1}/$maxRetries)',
-      );
-      final response = await http.post(
-        uri,
-        headers: headers,
-        body: jsonEncode(body),
-      );
-      // Only retry on 5xx server errors
-      if (response.statusCode < 500) {
-        return response;
-      }
-      attempts++;
-      if (attempts < maxRetries) {
-        logMessage(
-          LogLevel.WARNING,
-          'Request failed with ${response.statusCode}, retrying...',
-        );
-        await Future.delayed(retryDelay * attempts);
-      }
-    } on http.ClientException catch (e) {
-      logMessage(LogLevel.ERROR, 'Network error: $e');
-      attempts++;
-      if (attempts >= maxRetries) rethrow;
-      await Future.delayed(retryDelay * attempts);
-    }
-  }
-  throw Exception('Max retry attempts reached');
-}
-
 // Helper function to process HTTP response
 ticketdataResponse _processResponse(http.Response response) {
-  logMessage(LogLevel.INFO, 'Processing response: ${response.statusCode}');
   if (response.statusCode >= 200 && response.statusCode < 300) {
     return ticketdataResponse(
       success: true,
@@ -202,6 +132,3 @@ ticketdataResponse _processResponse(http.Response response) {
     statusCode: response.statusCode,
   );
 }
-
-// Set your action name, define your arguments and return parameter,
-// and then add the boilerplate code using the green button on the right!

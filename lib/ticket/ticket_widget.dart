@@ -58,16 +58,35 @@ class _TicketWidgetState extends State<TicketWidget>
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       _model.isLoaded = false;
       safeSetState(() {});
+      // Clean the ticketID in case it has quotes
+      final cleanTicketId = (widget!.ticketID ?? '').replaceAll('"', '').trim();
+      
       _model.searchResultsTicket = await actions.sendjsontourl(
-        ' {    \"modelName\": \"Ticket\",    \"searchCriteria\": {\"ticket_number\": ${widget!.ticketID}}}',
+        '{"modelName": "Ticket", "searchCriteria": {"ticket_number": "$cleanTicketId"}}',
         currentJwtToken!,
         FFAppConstants.searchURL,
       );
-      _model.ticketSiteId = await actions.sendjsontourl(
-        ' {    \"modelName\": \"Site\",    \"searchCriteria\": {\"id\": ${functions.getkeyfromjsonstring(functions.getkeyfromjsonstring(_model.searchResultsTicket!, 'site'), 'id')}}}',
-        currentJwtToken!,
-        FFAppConstants.searchURL,
-      );
+      
+      // Safely extract location ID from the ticket and fetch site details
+      final locationId = functions.getkeyfromjsonstring(
+        _model.searchResultsTicket!,
+        'location',
+      ).replaceAll('"', '').trim();
+      
+      print('[TicketWidget] Location ID from ticket: $locationId');
+      
+      // Only fetch site if we have a valid location ID
+      if (locationId.isNotEmpty && locationId != 'null') {
+        _model.ticketSiteId = await actions.sendjsontourl(
+          '{"modelName": "Location", "searchCriteria": {"id": "$locationId"}}',
+          currentJwtToken!,
+          FFAppConstants.searchURL,
+        );
+        print('[TicketWidget] Fetched location details: ${_model.ticketSiteId != null}');
+      } else {
+        print('[TicketWidget] No location ID found in ticket');
+      }
+      
       if ((functions.getkeyfromjsonstring(
                       _model.searchResultsTicket!, 'lockerSpace') !=
                   null &&
@@ -131,10 +150,12 @@ class _TicketWidgetState extends State<TicketWidget>
           backgroundColor: FlutterFlowTheme.of(context).secondary,
         ),
       );
-      _model.company =
-          functions.getkeyfromjsonstring(_model.ticketSiteId!, 'name');
-      _model.address =
-          functions.getkeyfromjsonstring(_model.ticketSiteId!, 'Address');
+      _model.company = _model.ticketSiteId != null
+          ? functions.getkeyfromjsonstring(_model.ticketSiteId!, 'name')
+          : '';
+      _model.address = _model.ticketSiteId != null
+          ? functions.getkeyfromjsonstring(_model.ticketSiteId!, 'address')
+          : '';
       _model.time = functions.getkeyfromjsonstring(
           functions.extractTime(functions.getkeyfromjsonstring(
               _model.searchResultsTicket!, 'created_at')),
@@ -143,31 +164,48 @@ class _TicketWidgetState extends State<TicketWidget>
           functions.extractTime(functions.getkeyfromjsonstring(
               _model.searchResultsTicket!, 'created_at')),
           'date');
-      if ((functions.getkeyfromjsonstring(
-                      _model.searchResultsTicket!, 'user_client') !=
-                  null &&
-              functions.getkeyfromjsonstring(
-                      _model.searchResultsTicket!, 'user_client') !=
-                  '') &&
-          (functions.getkeyfromjsonstring(
-                  _model.searchResultsTicket!, 'user_client') !=
-              'null')) {
+      // Extract user_client ID directly (it's a string ID, not an object)
+      final userClientId = functions.getkeyfromjsonstring(
+        _model.searchResultsTicket!,
+        'user_client',
+      ).replaceAll('"', '').trim();
+      
+      print('[TicketWidget] UserClient ID: $userClientId');
+      
+      if (userClientId.isNotEmpty && userClientId != 'null') {
         _model.clientData = await actions.sendjsontourl(
-          ' {    \"modelName\": \"UserClient\",    \"searchCriteria\": {\"id\": ${functions.getkeyfromjsonstring(functions.getkeyfromjsonstring(_model.searchResultsTicket!, 'user_client'), 'id')}}}',
+          '{"modelName": "UserClient", "searchCriteria": {"id": "$userClientId"}}',
           currentJwtToken!,
           FFAppConstants.searchURL,
         );
-        _model.name =
-            '${functions.getkeyfromjsonstring(_model.clientData!, 'firstname')} ${functions.getkeyfromjsonstring(_model.clientData!, 'lastname')}';
+        
+        // Extract firstname/lastname from insData JSON string
+        final insData = functions.getkeyfromjsonstring(_model.clientData!, 'insData');
+        final firstName = functions.getkeyfromjsonstring(insData, 'firstName');
+        final lastName = functions.getkeyfromjsonstring(insData, 'lastName');
+        
+        _model.name = '$firstName $lastName'.trim();
+        print('[TicketWidget] Client name: $_model.name');
         _model.isLoaded = true;
         safeSetState(() {});
       }
       _model.imageSelectedIndex = 0;
-      _model.savedImagesArray = functions
-          .jsontoArray(functions.getkeyfromjsonstring(
-              _model.searchResultsTicket!, 'arrivalPhoto'))
-          .toList()
-          .cast<String>();
+      // Safely handle arrivalPhoto - it might be empty or missing
+      final arrivalPhotoJson = functions.getkeyfromjsonstring(
+          _model.searchResultsTicket!, 'arrivalPhoto');
+      if (arrivalPhotoJson.isNotEmpty && arrivalPhotoJson != 'null') {
+        try {
+          _model.savedImagesArray = functions
+              .jsontoArray(arrivalPhotoJson)
+              .toList()
+              .cast<String>();
+        } catch (e) {
+          print('[TicketWidget] Error parsing arrivalPhoto: $e');
+          _model.savedImagesArray = [];
+        }
+      } else {
+        _model.savedImagesArray = [];
+      }
       while (_model.imageSelectedIndex < _model.savedImagesArray.length) {
         _model.savedImageintoFile = await actions.base64toBytesAction(
           '\"${_model.savedImagesArray.elementAtOrNull(_model.imageSelectedIndex)}\"',

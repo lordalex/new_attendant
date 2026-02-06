@@ -23,7 +23,7 @@ Future<FFUploadedFile> base64toBytesAction(
   final String base64Input = base64;
   final String originalInputForLog =
       base64Input.substring(0, math.min(base64Input.length, 100)) ??
-      "null_input";
+          "null_input";
   final bool logSpam = verbosityLevel >= V_SPAM;
 
   if (verbosityLevel >= V_INFO)
@@ -31,10 +31,39 @@ Future<FFUploadedFile> base64toBytesAction(
       '[V_INFO] base64toBytesAction started. File: "$fileName", Verbosity: $verbosityLevel. Input (first 100): "$originalInputForLog${base64Input.length > 100 ? "..." : ""}"',
     );
 
-  if (base64Input.isEmpty) {
+  // Check for empty or error input
+  if (base64Input.isEmpty ||
+      base64Input == "error" ||
+      base64Input == "" ||
+      base64Input.toLowerCase().contains("not found") ||
+      base64Input.toLowerCase().contains("invalid")) {
     if (verbosityLevel >= V_INFO)
-      print("[V_INFO] Error: Input base64 string is null or empty.");
-    return FFUploadedFile(name: "error_null_input.txt", bytes: Uint8List(0));
+      print(
+          "[V_INFO] Input is empty, error, or invalid. Returning placeholder.");
+    return FFUploadedFile(
+        name: "placeholder_no_image.txt", bytes: Uint8List(0));
+  }
+
+  // Check if input looks like base64 (should contain base64 characters)
+  final RegExp base64Pattern = RegExp(r'^[A-Za-z0-9+/]*={0,2}$');
+  final String testString =
+      base64Input.length > 100 ? base64Input.substring(0, 100) : base64Input;
+
+  // Remove common prefixes for testing
+  String testWithoutPrefix = testString;
+  if (testString.contains(',')) {
+    testWithoutPrefix = testString.substring(testString.indexOf(',') + 1);
+  }
+
+  // Check if the input contains at least some base64-like content
+  if (!base64Pattern.hasMatch(
+          testWithoutPrefix.replaceAll(RegExp(r'[^A-Za-z0-9+/=]'), '')) &&
+      testWithoutPrefix.length < 20) {
+    if (verbosityLevel >= V_INFO)
+      print(
+          "[V_INFO] Input does not appear to be valid base64 data. Input: $base64Input");
+    return FFUploadedFile(
+        name: "placeholder_no_image.txt", bytes: Uint8List(0));
   }
 
   try {

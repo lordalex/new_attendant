@@ -13,6 +13,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'slidable_tile_ticket_list_completed_model.dart';
 export 'slidable_tile_ticket_list_completed_model.dart';
+import '../../../models/ticket_model.dart';
+import '../../../services/vehicle_service.dart';
 
 class SlidableTileTicketListCompletedWidget extends StatefulWidget {
   const SlidableTileTicketListCompletedWidget({
@@ -24,6 +26,9 @@ class SlidableTileTicketListCompletedWidget extends StatefulWidget {
     Color? timeTextColor,
     required this.ticketNumber,
     this.tipAmount,
+    this.ticketJson,
+    this.apiUrl,
+    this.idToken,
   }) : this.timeTextColor = timeTextColor ?? const Color(0xFF57636C);
 
   final String? plate;
@@ -33,6 +38,9 @@ class SlidableTileTicketListCompletedWidget extends StatefulWidget {
   final Color timeTextColor;
   final String? ticketNumber;
   final String? tipAmount;
+  final String? ticketJson;
+  final String? apiUrl;
+  final String? idToken;
 
   @override
   State<SlidableTileTicketListCompletedWidget> createState() =>
@@ -59,6 +67,60 @@ class _SlidableTileTicketListCompletedWidgetState
 
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
+      // NEW: Parse ticket JSON and fetch vehicle data
+      if (widget!.ticketJson != null && widget!.ticketJson!.isNotEmpty) {
+        try {
+          print("[SlidableTile] Parsing ticket JSON");
+          _model.ticket = Ticket.fromJson(widget!.ticketJson!);
+
+          // Calculate time difference
+          _model.timeDifferenceText = _model.ticket!.timeDifference;
+          print("[SlidableTile] Time difference: ${_model.timeDifferenceText}");
+
+          // Load client photo safely
+          if (_model.ticket!.hasClientPhoto) {
+            print("[SlidableTile] Loading client photo");
+            _model.clientPhoto = await actions.base64toBytesAction(
+              _model.ticket!.clientPhotoUrl!,
+              'clientPhoto',
+            );
+          }
+
+          // Fetch vehicle data if available
+          if (widget!.apiUrl != null &&
+              widget!.idToken != null &&
+              _model.ticket!.vehicle.isNotEmpty) {
+            print("[SlidableTile] Fetching vehicle data");
+            final vehicleService = VehicleService(
+              apiUrl: widget!.apiUrl!,
+              idToken: widget!.idToken!,
+            );
+
+            final vehicleData = await vehicleService
+                .fetchVehicleDetails(_model.ticket!.vehicle);
+            if (vehicleData != null) {
+              print("[SlidableTile] Vehicle data loaded");
+              _model.ticket = _model.ticket!.copyWith(vehicleData: vehicleData);
+              _model.vehicleDisplayText = _model.ticket!.formattedVehicle;
+            } else {
+              _model.vehicleDisplayText = "Vehicle info unavailable";
+            }
+          } else {
+            _model.vehicleDisplayText = "Vehicle info unavailable";
+          }
+
+          _model.isLoadingVehicle = false;
+          safeSetState(() {});
+        } catch (e) {
+          print("[SlidableTile] Error: $e");
+          _model.isLoadingVehicle = false;
+          _model.vehicleDisplayText = "Vehicle info unavailable";
+        }
+      } else {
+        // Legacy mode - use existing logic
+        _model.isLoadingVehicle = false;
+        _model.vehicleDisplayText = "Vehicle info unavailable";
+      }
       _model.clientPhoto = await actions.base64toBytesAction(
         widget!.profileImg!,
         'clientPhoto',
@@ -146,22 +208,31 @@ class _SlidableTileTicketListCompletedWidgetState
                     height: 58.1,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).secondaryBackground,
-                      image: DecorationImage(
-                        fit: BoxFit.contain,
-                        image: Image.memory(
-                          _model.clientPhoto?.bytes ?? Uint8List.fromList([]),
-                        ).image,
-                      ),
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
-                      child: Image.memory(
-                        _model.clientPhoto?.bytes ?? Uint8List.fromList([]),
-                        width: 209.91,
-                        height: 215.5,
-                        fit: BoxFit.cover,
-                      ),
+                      child: (_model.clientPhoto?.bytes != null &&
+                              _model.clientPhoto!.bytes!.isNotEmpty)
+                          ? Image.memory(
+                              _model.clientPhoto!.bytes!,
+                              width: 209.91,
+                              height: 215.5,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Image.asset(
+                                'assets/images/error_image.png',
+                                width: 209.91,
+                                height: 215.5,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Image.asset(
+                              'assets/images/image-default.jpg',
+                              width: 209.91,
+                              height: 215.5,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                 ),
@@ -214,6 +285,58 @@ class _SlidableTileTicketListCompletedWidgetState
                             ),
                           ),
                         ),
+                        // Display time difference
+                        if (_model.timeDifferenceText != null)
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                0.0, 4.0, 0.0, 0.0),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8.0, vertical: 2.0),
+                              decoration: BoxDecoration(
+                                color: Colors.blue[50],
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              child: Text(
+                                _model.timeDifferenceText!,
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.blue[700],
+                                ),
+                              ),
+                            ),
+                          ),
+                        // Display vehicle info
+                        if (_model.vehicleDisplayText != null)
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                0.0, 4.0, 0.0, 0.0),
+                            child: Row(
+                              children: [
+                                Icon(Icons.directions_car,
+                                    size: 14.0, color: Colors.grey[600]),
+                                SizedBox(width: 4.0),
+                                Expanded(
+                                  child: Text(
+                                    _model.isLoadingVehicle
+                                        ? "Loading vehicle..."
+                                        : _model.vehicleDisplayText!,
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                      color: _model.isLoadingVehicle
+                                          ? Colors.grey[500]
+                                          : Colors.grey[800],
+                                      fontStyle: _model.isLoadingVehicle
+                                          ? FontStyle.italic
+                                          : FontStyle.normal,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                   ),

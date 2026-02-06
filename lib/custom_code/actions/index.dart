@@ -5,3 +5,4 @@ export 'fetch_enriched_entity.dart' show fetchEnrichedEntity;
 export 'lock_orientation.dart' show lockOrientation;
 export 'base64to_bytes_action.dart' show base64toBytesAction;
 export 'bytestobase64_action.dart' show bytestobase64Action;
+export 'fetch_vehicle_details.dart' show fetchVehicleDetails;

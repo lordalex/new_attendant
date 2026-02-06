@@ -16,6 +16,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'slidable_tile_ticket_list_arrival_model.dart';
 export 'slidable_tile_ticket_list_arrival_model.dart';
+import '../../../models/ticket_model.dart';
+import '../../../services/vehicle_service.dart';
 
 class SlidableTileTicketListArrivalWidget extends StatefulWidget {
   const SlidableTileTicketListArrivalWidget({
@@ -29,6 +31,10 @@ class SlidableTileTicketListArrivalWidget extends StatefulWidget {
     int? timerTimeIntegerMs,
     String? vehicleInfo,
     required this.date,
+    // NEW: Accept ticket JSON directly
+    this.ticketJson,
+    this.apiUrl,
+    this.idToken,
   })  : this.timeTextColor = timeTextColor ?? const Color(0xFF57636C),
         this.timerTimeIntegerMs = timerTimeIntegerMs ?? 0,
         this.vehicleInfo = vehicleInfo ?? ' ';
@@ -47,6 +53,11 @@ class SlidableTileTicketListArrivalWidget extends StatefulWidget {
   final String vehicleInfo;
 
   final String? date;
+
+  // NEW: Ticket data for new system
+  final String? ticketJson;
+  final String? apiUrl;
+  final String? idToken;
 
   @override
   State<SlidableTileTicketListArrivalWidget> createState() =>
@@ -80,20 +91,112 @@ class _SlidableTileTicketListArrivalWidgetState
       _model.timerController.onResetTimer();
 
       _model.timerController.onStartTimer();
-      if (widget!.profileImg != null && widget!.profileImg != '') {
-        _model.clientPhoto1 = await actions.base64toBytesAction(
-          widget!.profileImg!,
-          'clientPhoto',
-        );
-        _model.clientPhoto = _model.clientPhoto1;
-        safeSetState(() {});
+
+      // NEW: Parse ticket JSON and fetch vehicle data
+      if (widget!.ticketJson != null && widget!.ticketJson!.isNotEmpty) {
+        try {
+          print("[SlidableTile] Parsing ticket JSON");
+          _model.ticket = Ticket.fromJson(widget!.ticketJson!);
+
+          // Calculate time difference
+          _model.timeDifferenceText = _model.ticket!.timeDifference;
+          print("[SlidableTile] Time difference: ${_model.timeDifferenceText}");
+
+          // Load client photo safely
+          if (_model.ticket!.hasClientPhoto) {
+            print("[SlidableTile] Loading client photo");
+            _model.clientPhoto1 = await actions.base64toBytesAction(
+              _model.ticket!.clientPhotoUrl!,
+              'clientPhoto',
+            );
+            _model.clientPhoto = _model.clientPhoto1;
+          } else {
+            print("[SlidableTile] Using default photo");
+            _model.clientPhoto2 = await actions.base64toBytesAction(
+              FFAppState().defaultpic,
+              'clientPhoto',
+            );
+            _model.clientPhoto = _model.clientPhoto2;
+          }
+
+          // Fetch vehicle data if available
+          if (widget!.apiUrl != null &&
+              widget!.idToken != null &&
+              _model.ticket!.vehicle.isNotEmpty) {
+            print(
+                "[SlidableTile] Fetching vehicle data for: ${_model.ticket!.vehicle}");
+            final vehicleService = VehicleService(
+              apiUrl: widget!.apiUrl!,
+              idToken: widget!.idToken!,
+            );
+
+            final vehicleData = await vehicleService
+                .fetchVehicleDetails(_model.ticket!.vehicle);
+            if (vehicleData != null) {
+              print("[SlidableTile] Vehicle data loaded successfully");
+              _model.ticket = _model.ticket!.copyWith(vehicleData: vehicleData);
+              _model.vehicleDisplayText = _model.ticket!.formattedVehicle;
+            } else {
+              print("[SlidableTile] Vehicle data not found");
+              _model.vehicleDisplayText = widget!.vehicleInfo != ' '
+                  ? widget!.vehicleInfo
+                  : "Vehicle info unavailable";
+            }
+          } else {
+            // Fallback to provided vehicleInfo
+            _model.vehicleDisplayText = widget!.vehicleInfo != ' '
+                ? widget!.vehicleInfo
+                : "Vehicle info unavailable";
+          }
+
+          _model.isLoadingVehicle = false;
+          safeSetState(() {});
+        } catch (e) {
+          print("[SlidableTile] Error loading ticket data: $e");
+          // Fallback to old behavior
+          _model.isLoadingVehicle = false;
+          _model.vehicleDisplayText = widget!.vehicleInfo != ' '
+              ? widget!.vehicleInfo
+              : "Vehicle info unavailable";
+          _model.timeDifferenceText = null;
+
+          if (widget!.profileImg != null && widget!.profileImg != '') {
+            _model.clientPhoto1 = await actions.base64toBytesAction(
+              widget!.profileImg!,
+              'clientPhoto',
+            );
+            _model.clientPhoto = _model.clientPhoto1;
+          } else {
+            _model.clientPhoto2 = await actions.base64toBytesAction(
+              FFAppState().defaultpic,
+              'clientPhoto',
+            );
+            _model.clientPhoto = _model.clientPhoto2;
+          }
+          safeSetState(() {});
+        }
       } else {
-        _model.clientPhoto2 = await actions.base64toBytesAction(
-          FFAppState().defaultpic,
-          'clientPhoto',
-        );
-        _model.clientPhoto = _model.clientPhoto2;
-        _model.updatePage(() {});
+        // OLD BEHAVIOR: Use individual parameters
+        print("[SlidableTile] Using legacy parameter mode");
+        if (widget!.profileImg != null && widget!.profileImg != '') {
+          _model.clientPhoto1 = await actions.base64toBytesAction(
+            widget!.profileImg!,
+            'clientPhoto',
+          );
+          _model.clientPhoto = _model.clientPhoto1;
+          safeSetState(() {});
+        } else {
+          _model.clientPhoto2 = await actions.base64toBytesAction(
+            FFAppState().defaultpic,
+            'clientPhoto',
+          );
+          _model.clientPhoto = _model.clientPhoto2;
+          _model.updatePage(() {});
+        }
+        _model.isLoadingVehicle = false;
+        _model.vehicleDisplayText = widget!.vehicleInfo != ' '
+            ? widget!.vehicleInfo
+            : "Vehicle info unavailable";
       }
     });
 
@@ -178,29 +281,31 @@ class _SlidableTileTicketListArrivalWidgetState
                     height: 77.6,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).secondaryBackground,
-                      image: DecorationImage(
-                        fit: BoxFit.contain,
-                        image: Image.memory(
-                          _model.clientPhoto?.bytes ?? Uint8List.fromList([]),
-                        ).image,
-                      ),
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
-                      child: Image.memory(
-                        _model.clientPhoto?.bytes ?? Uint8List.fromList([]),
-                        width: 207.4,
-                        height: 77.6,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Image.asset(
-                          'assets/images/error_image.png',
-                          width: 207.4,
-                          height: 77.6,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                      child: (_model.clientPhoto?.bytes != null &&
+                              _model.clientPhoto!.bytes!.isNotEmpty)
+                          ? Image.memory(
+                              _model.clientPhoto!.bytes!,
+                              width: 207.4,
+                              height: 77.6,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Image.asset(
+                                'assets/images/error_image.png',
+                                width: 207.4,
+                                height: 77.6,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Image.asset(
+                              'assets/images/image-default.jpg',
+                              width: 207.4,
+                              height: 77.6,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                 ),
@@ -245,6 +350,77 @@ class _SlidableTileTicketListArrivalWidgetState
                                             .fontStyle,
                                       ),
                                 ),
+                                // NEW: Display time difference
+                                if (_model.timeDifferenceText != null)
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 4.0, 0.0, 0.0),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 8.0, vertical: 2.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue[50],
+                                        borderRadius:
+                                            BorderRadius.circular(4.0),
+                                      ),
+                                      child: Text(
+                                        _model.timeDifferenceText!,
+                                        style: TextStyle(
+                                          fontSize: 12.0,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.blue[700],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                // NEW: Display vehicle info
+                                if (_model.vehicleDisplayText != null)
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 4.0, 0.0, 0.0),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.directions_car,
+                                          size: 14.0,
+                                          color: Colors.grey[600],
+                                        ),
+                                        SizedBox(width: 4.0),
+                                        Expanded(
+                                          child: Text(
+                                            _model.isLoadingVehicle
+                                                ? "Loading vehicle..."
+                                                : _model.vehicleDisplayText!,
+                                            style: TextStyle(
+                                              fontSize: 12.0,
+                                              color: _model.isLoadingVehicle
+                                                  ? Colors.grey[500]
+                                                  : Colors.grey[800],
+                                              fontStyle: _model.isLoadingVehicle
+                                                  ? FontStyle.italic
+                                                  : FontStyle.normal,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                // NEW: Display plate if available
+                                if (widget!.plate != null &&
+                                    widget!.plate!.isNotEmpty)
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 2.0, 0.0, 0.0),
+                                    child: Text(
+                                      "Plate: ${widget!.plate}",
+                                      style: TextStyle(
+                                        fontSize: 11.0,
+                                        color: Colors.grey[600],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
                                 Align(
                                   alignment: AlignmentDirectional(0.0, 0.0),
                                   child: Padding(

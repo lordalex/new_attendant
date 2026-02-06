@@ -1,14 +1,10 @@
 // Automatic FlutterFlow imports
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'index.dart'; // Imports other custom actions
-import '/flutter_flow/custom_functions.dart'; // Imports custom functions
-import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../services/http_request_manager.dart';
 
 // Define a custom exception for API errors
 class ApiException implements Exception {
@@ -29,8 +25,9 @@ Future<String> sendjsontourl(
   String token,
   String baseUrl,
 ) async {
-  print('Starting sendJsonData function...');
-  print(jsonString);
+  // Reduced verbosity - only key info
+  print('[sendjsontourl] Starting request to: $baseUrl');
+  
   // Explicit parameter validation
   if (jsonString.isEmpty) {
     throw ApiException('JSON string cannot be null or empty');
@@ -39,83 +36,42 @@ Future<String> sendjsontourl(
     throw ApiException('Base URL cannot be null or empty');
   }
 
-  // URI parsing block
+  // URI parsing
   Uri uri;
   try {
     uri = Uri.parse(baseUrl);
-    print('URI parsed successfully: $uri');
   } catch (e) {
-    print('Error parsing URI: ${e.toString()}');
     throw ApiException('URI parsing failed: ${e.toString()}', statusCode: -1);
   }
 
-  // Request data preparation block
+  // Prepare request body
   String requestBody;
   try {
-    // Attempt to parse JSON string to a JSON object
     dynamic jsonData = json.decode(jsonString);
-
-    // Construct the outer JSON structure
     Map<String, dynamic> postData = {"idToken": token, "data": jsonData};
-
-    print(postData);
-
     requestBody = jsonEncode(postData);
-    print('Request data prepared: $requestBody');
   } catch (e) {
-    print('Error parsing JSON string: ${e.toString()}');
-    throw ApiException(
-      'Error parsing JSON string: ${e.toString()}',
-      statusCode: -2,
+    throw ApiException('Error parsing JSON string: ${e.toString()}', statusCode: -2);
+  }
+
+  // Make request using HTTP Manager (queued)
+  try {
+    final response = await HttpRequestManager().post(
+      uri: uri,
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: requestBody,
+      priority: RequestPriority.normal,
+      description: 'sendjsontourl: $baseUrl',
+      timeout: const Duration(seconds: 30),
     );
-  }
 
-  // Headers preparation block
-  Map<String, String> headers;
-  try {
-    headers = {'Content-Type': 'application/json; charset=UTF-8'};
-    print('Headers prepared: $headers');
-  } catch (e) {
-    print('Error preparing headers: ${e.toString()}');
-    throw ApiException(
-      'Headers preparation failed: ${e.toString()}',
-      statusCode: -3,
-    );
-  }
-
-  // HTTP request block
-  http.Response response;
-  try {
-    print('Sending HTTP request...');
-    response = await http
-        .post(uri, headers: headers, body: requestBody)
-        .timeout(
-          const Duration(seconds: 30),
-          onTimeout: () {
-            print('Request timed out');
-            throw ApiException(
-              'Request timed out after 30 seconds',
-              statusCode: -4,
-            );
-          },
-        );
-    print('Response received with status code: ${response.statusCode}');
-  } catch (e) {
-    print('Error in HTTP request: ${e.toString()}');
-    throw ApiException('HTTP request failed: ${e.toString()}', statusCode: -5);
-  }
-
-  // Response handling block
-  try {
-    print('Processing response...');
+    // Response handling
     if (response.statusCode == 200) {
       try {
-        // Try to parse response body
         dynamic responseData = json.decode(response.body);
-        print('Response parsed successfully: $responseData');
-        return jsonEncode(responseData); // Return the stringified JSON data
+        print('[sendjsontourl] Success: ${response.statusCode}');
+        return jsonEncode(responseData);
       } catch (e) {
-        print('Could not parse response body: ${e.toString()}');
         return jsonEncode({
           'status': 'success',
           'message': 'Response parsing failed',
@@ -144,19 +100,14 @@ Future<String> sendjsontourl(
         default:
           errorMessage = 'Request failed with status: ${response.statusCode}';
       }
-      print('API Error: $errorMessage (Status Code: ${response.statusCode})');
-      print(response.body);
+      print('[sendjsontourl] Error: $errorMessage');
       return response.statusCode.toString();
     }
+  } on TimeoutException catch (e) {
+    print('[sendjsontourl] Timeout: ${e.message}');
+    throw ApiException('Request timed out: ${e.message}', statusCode: -4);
   } catch (e) {
-    print('Error processing response: ${e.toString()}');
-    throw ApiException(
-      'Response processing failed: ${e.toString()}',
-      statusCode: -6,
-      data: jsonEncode({
-        'message': 'Response processing failed',
-        'error': e.toString(),
-      }),
-    );
+    print('[sendjsontourl] Error: ${e.toString()}');
+    throw ApiException('HTTP request failed: ${e.toString()}', statusCode: -5);
   }
 }

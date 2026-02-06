@@ -107,36 +107,13 @@ class _TicketListWidgetState extends State<TicketListWidget>
       safeSetState(() {});
       _model.tmpBuffer = ' ';
       safeSetState(() {});
-      _model.instantTimer2 = InstantTimer.periodic(
-        duration: Duration(milliseconds: 7600),
-        callback: (timer) async {
-          _model.ticketlistA = await actions.sendjsontourl(
-            '{\"status\": \"${widget!.status}\"}',
-            currentJwtToken!,
-            FFAppConstants.ticketListURL,
-          );
-          if (_model.ticketlistA == '401') {
-            context.pushNamed(LoginPageWidget.routeName);
-
-            _model.instantTimer2?.cancel();
-            return;
-          } else {
-            if (_model.tmpBuffer != _model.ticketlistA) {
-              _model.isLoadedQueryList = false;
-              _model.tickets = [];
-              _model.tickets = functions
-                  .jsontoArray(_model.ticketlistA!)
-                  .toList()
-                  .cast<String>();
-              _model.isLoadedQueryList = true;
-              safeSetState(() {});
-            }
-          }
-        },
-        startImmediately: true,
-      );
+      
+      // Start intelligent polling
+      _startIntelligentPolling();
     });
-
+    
+    // Add lifecycle observer for visibility changes
+    WidgetsBinding.instance.addObserver(_lifecycleObserver);
     _model.tabBarController = TabController(
       vsync: this,
       length: 6,
@@ -157,17 +134,6 @@ class _TicketListWidgetState extends State<TicketListWidget>
     )..addListener(() => safeSetState(() {}));
   }
 
-  @override
-  void dispose() {
-    // On page dispose action.
-    () async {
-      _model.instantTimer2?.cancel();
-    }();
-
-    _model.dispose();
-
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -506,6 +472,15 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                                   SlidableTileTicketListArrivalWidget(
                                                                 key: Key(
                                                                     'Keymtk_${ticketLIndex}_of_${ticketL.length}'),
+                                                                // NEW: Pass ticket JSON directly
+                                                                ticketJson:
+                                                                    ticketLItem,
+                                                                apiUrl:
+                                                                    FFAppConstants
+                                                                        .baseUrl,
+                                                                idToken:
+                                                                    currentJwtToken,
+                                                                // Legacy parameters (optional, for backward compatibility)
                                                                 name: functions
                                                                     .tostr(
                                                                         '${functions.getkeyfromjsonstring(functions.getkeyfromjsonstring(ticketLItem, 'user_client'), 'firstname')} ${functions.getkeyfromjsonstring(functions.getkeyfromjsonstring(ticketLItem, 'user_client'), 'lastname')}'),
@@ -582,14 +557,17 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                                               .secondary,
                                                                     ),
                                                                   );
-                                                                  // falta logica en drag end
+                                                                  // Use setStatus action with ticket ID
                                                                   _model.setToProcessing =
                                                                       await actions
-                                                                          .sendjsontourl(
-                                                                    '{\"ticket_number\": ${functions.getkeyfromjsonstring(ticketLItem, 'ticket_number')}}',
-                                                                    currentJwtToken!,
+                                                                          .setStatus(
                                                                     FFAppConstants
-                                                                        .settickettoprocessing,
+                                                                        .setTicketStatus,
+                                                                    currentJwtToken!,
+                                                                    'Processing-Arrival',
+                                                                    functions.getkeyfromjsonstring(
+                                                                        ticketLItem,
+                                                                        'id'),
                                                                   );
 
                                                                   safeSetState(
@@ -707,6 +685,13 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                             SlidableTileTicketListProcessingWidget(
                                                               key: Key(
                                                                   'Keye6x_${ticketLIndex}_of_${ticketL.length}'),
+                                                              ticketJson:
+                                                                  ticketLItem,
+                                                              apiUrl:
+                                                                  FFAppConstants
+                                                                      .baseUrl,
+                                                              idToken:
+                                                                  currentJwtToken,
                                                               name: functions.tostr(
                                                                   '${functions.getkeyfromjsonstring(functions.getkeyfromjsonstring(ticketLItem, 'user_client'), 'firstname')} ${functions.getkeyfromjsonstring(functions.getkeyfromjsonstring(ticketLItem, 'user_client'), 'lastname')}'),
                                                               plate: functions.tostr(
@@ -773,21 +758,10 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                                 _model.posx =
                                                                     0.0;
 
-                                                                context
-                                                                    .pushNamed(
-                                                                  TicketWidget
-                                                                      .routeName,
-                                                                  queryParameters:
-                                                                      {
-                                                                    'ticketID':
-                                                                        serializeParam(
-                                                                      functions.getkeyfromjsonstring(
-                                                                          ticketLItem,
-                                                                          'ticket_number'),
-                                                                      ParamType
-                                                                          .String,
-                                                                    ),
-                                                                  }.withoutNulls,
+                                                                await _navigateToTicketDetail(
+                                                                  functions.getkeyfromjsonstring(
+                                                                      ticketLItem,
+                                                                      'ticket_number'),
                                                                 );
                                                               },
                                                             ),
@@ -883,6 +857,10 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                 return SlidableTileTicketListParkedWidget(
                                                   key: Key(
                                                       'Key8cc_${ticketLIndex}_of_${ticketL.length}'),
+                                                  ticketJson: ticketLItem,
+                                                  apiUrl:
+                                                      FFAppConstants.baseUrl,
+                                                  idToken: currentJwtToken,
                                                   name:
                                                       '${functions.getkeyfromjsonstring(functions.getkeyfromjsonstring(ticketLItem, 'user_client'), 'firstname')} ${functions.getkeyfromjsonstring(functions.getkeyfromjsonstring(ticketLItem, 'user_client'), 'lastname')}',
                                                   plate: functions.tostr(functions
@@ -939,18 +917,10 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                           ticketLItem,
                                                           'ticket_number'),
                                                   callback: () async {
-                                                    context.pushNamed(
-                                                      TicketWidget.routeName,
-                                                      queryParameters: {
-                                                        'ticketID':
-                                                            serializeParam(
-                                                          functions
-                                                              .getkeyfromjsonstring(
-                                                                  ticketLItem,
-                                                                  'ticket_number'),
-                                                          ParamType.String,
-                                                        ),
-                                                      }.withoutNulls,
+                                                    await _navigateToTicketDetail(
+                                                      functions.getkeyfromjsonstring(
+                                                          ticketLItem,
+                                                          'ticket_number'),
                                                     );
                                                   },
                                                 );
@@ -1032,6 +1002,11 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                         SlidableTileTicketListDepartureWidget(
                                                       key: Key(
                                                           'Key1f5_${ticketsDepartureIndex}_of_${ticketsDeparture.length}'),
+                                                      ticketJson:
+                                                          ticketsDepartureItem,
+                                                      apiUrl: FFAppConstants
+                                                          .baseUrl,
+                                                      idToken: currentJwtToken,
                                                       name:
                                                           '${functions.getkeyfromjsonstring(functions.getkeyfromjsonstring(ticketsDepartureItem, 'user_client'), 'firstname')} ${functions.getkeyfromjsonstring(functions.getkeyfromjsonstring(ticketsDepartureItem, 'user_client'), 'lastname')}',
                                                       plate: functions.tostr(functions
@@ -1089,14 +1064,17 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                         _model.removeAtIndexFromTickets(
                                                             ticketsDepartureIndex);
                                                         safeSetState(() {});
-                                                        // falta logica en drag end
+                                                        // Use setStatus action with ticket ID
                                                         _model.setToProcessingDeparture =
                                                             await actions
-                                                                .sendjsontourl(
-                                                          '{\"ticket_number\": ${functions.getkeyfromjsonstring(ticketsDepartureItem, 'ticket_number')}}',
-                                                          currentJwtToken!,
+                                                                .setStatus(
                                                           FFAppConstants
-                                                              .settickettoprocessing,
+                                                              .setTicketStatus,
+                                                          currentJwtToken!,
+                                                          'Processing-Departure',
+                                                          functions.getkeyfromjsonstring(
+                                                              ticketsDepartureItem,
+                                                              'id'),
                                                         );
 
                                                         safeSetState(() {});
@@ -1229,19 +1207,11 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                                         ticketsProcessingDepartureItem,
                                                         'created_at'),
                                                 callback: () async {
-                                                  context.pushNamed(
-                                                    TicketWidget.routeName,
-                                                    queryParameters: {
-                                                      'ticketID':
-                                                          serializeParam(
-                                                        functions.getkeyfromjsonstring(
-                                                            ticketsProcessingDepartureItem,
-                                                            'ticket_number'),
-                                                        ParamType.String,
-                                                      ),
-                                                    }.withoutNulls,
+                                                  await _navigateToTicketDetail(
+                                                    functions.getkeyfromjsonstring(
+                                                        ticketsProcessingDepartureItem,
+                                                        'ticket_number'),
                                                   );
-
                                                   _model.posx = 0.0;
                                                 },
                                               );
@@ -1324,6 +1294,10 @@ class _TicketListWidgetState extends State<TicketListWidget>
                                             return SlidableTileTicketListCompletedWidget(
                                               key: Key(
                                                   'Keylrg_${ticketsProcessingCompletedIndex}_of_${ticketsProcessingCompleted.length}'),
+                                              ticketJson:
+                                                  ticketsProcessingCompletedItem,
+                                              apiUrl: FFAppConstants.baseUrl,
+                                              idToken: currentJwtToken,
                                               plate: functions.tostr(functions
                                                   .getkeyfromjsonstring(
                                                       functions
@@ -1417,5 +1391,133 @@ class _TicketListWidgetState extends State<TicketListWidget>
         ),
       ),
     );
+  }
+
+  // Lifecycle observer to detect when app goes to background/foreground
+  late final _lifecycleObserver = _LifecycleEventObserver(
+    onResume: () => _model.onResume(),
+    onPause: () => _model.onPause(),
+  );
+
+  // Route observer to detect navigation to/from detail pages
+  late final _routeObserver = RouteObserver<PageRoute>();
+
+  // Start intelligent polling that respects HTTP operations and visibility
+  void _startIntelligentPolling() {
+    print('[TicketList] Starting intelligent polling');
+    
+    // Immediate first fetch
+    _fetchTicketList();
+    
+    // Setup periodic timer with intelligent checks
+    _model.instantTimer2 = InstantTimer.periodic(
+      duration: Duration(milliseconds: 7600),
+      callback: (timer) async {
+        // Skip if we shouldn't fetch (HTTP busy, not visible, or paused)
+        if (!_model.shouldFetch()) {
+          print('[TicketList] Skipping fetch - canFetch: ${_model.canFetch}, shouldFetch: ${_model.shouldFetch()}');
+          return;
+        }
+        
+        await _fetchTicketList();
+      },
+      startImmediately: false, // We already did the first fetch
+    );
+  }
+
+  // Navigate to ticket detail with polling pause
+  Future<void> _navigateToTicketDetail(String ticketNumber) async {
+    _model.onNavigateToDetail();
+    
+    // Clean the ticket number by removing surrounding quotes if present
+    final cleanTicketNumber = ticketNumber.replaceAll('"', '').trim();
+    
+    await context.pushNamed(
+      TicketWidget.routeName,
+      queryParameters: {
+        'ticketID': serializeParam(
+          cleanTicketNumber,
+          ParamType.String,
+        ),
+      }.withoutNulls,
+    );
+    
+    // When we return, refresh and resume polling
+    _model.onReturnFromDetail();
+    await _fetchTicketList();
+    
+    // Restart the polling timer
+    _startIntelligentPolling();
+  }
+
+  // Fetch ticket list with error handling
+  Future<void> _fetchTicketList() async {
+    try {
+      _model.updateLastFetchTime();
+      
+      _model.ticketlistA = await actions.sendjsontourl(
+        '{"status": "${widget.status}"}',
+        currentJwtToken!,
+        FFAppConstants.ticketListURL,
+      );
+      
+      if (_model.ticketlistA == '401') {
+        if (mounted) {
+          context.pushNamed(LoginPageWidget.routeName);
+        }
+        _model.instantTimer2?.cancel();
+        return;
+      }
+      
+      // Only update UI if data changed
+      if (_model.tmpBuffer != _model.ticketlistA) {
+        _model.isLoadedQueryList = false;
+        _model.tickets = [];
+        _model.tickets = functions
+            .jsontoArray(_model.ticketlistA!)
+            .toList()
+            .cast<String>();
+        _model.isLoadedQueryList = true;
+        
+        if (mounted) {
+          safeSetState(() {});
+        }
+      }
+    } catch (e) {
+      print('[TicketList] Error fetching tickets: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(_lifecycleObserver);
+    super.dispose();
+  }
+}
+
+// Helper class to observe app lifecycle events
+class _LifecycleEventObserver extends WidgetsBindingObserver {
+  final VoidCallback onResume;
+  final VoidCallback onPause;
+
+  _LifecycleEventObserver({
+    required this.onResume,
+    required this.onPause,
+  });
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        onResume();
+        break;
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+        onPause();
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
   }
 }

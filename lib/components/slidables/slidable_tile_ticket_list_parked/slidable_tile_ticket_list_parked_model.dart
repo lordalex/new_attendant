@@ -18,6 +18,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import '../../../models/ticket_model.dart';
 
 class SlidableTileTicketListParkedModel
     extends FlutterFlowModel<SlidableTileTicketListParkedWidget> {
@@ -33,6 +34,12 @@ class SlidableTileTicketListParkedModel
       posxx[index] = updateFn(posxx[index]);
 
   double posx = 0.0;
+
+  // NEW: Vehicle data fields
+  Ticket? ticket;
+  bool isLoadingVehicle = true;
+  String? vehicleDisplayText;
+  String? timeDifferenceText;
 
   ///  State fields for stateful widgets in this component.
 

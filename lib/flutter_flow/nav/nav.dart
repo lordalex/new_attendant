@@ -82,25 +82,26 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
       refreshListenable: appStateNotifier,
       navigatorKey: appNavigatorKey,
       errorBuilder: (context, state) =>
-          appStateNotifier.loggedIn ? NavBarPage() : LoginPageWidget(),
+          appStateNotifier.loggedIn ? NavBarPage() : const LoginPageWidget(),
       routes: [
         FFRoute(
           name: '_initialize',
           path: '/',
-          builder: (context, _) =>
-              appStateNotifier.loggedIn ? NavBarPage() : LoginPageWidget(),
+          builder: (context, _) => appStateNotifier.loggedIn
+              ? NavBarPage()
+              : const LoginPageWidget(),
         ),
         FFRoute(
           name: LoginPageWidget.routeName,
           path: LoginPageWidget.routePath,
-          builder: (context, params) => LoginPageWidget(),
+          builder: (context, params) => const LoginPageWidget(),
         ),
         FFRoute(
           name: HomePageWidget.routeName,
           path: HomePageWidget.routePath,
           builder: (context, params) => params.isEmpty
               ? NavBarPage(initialPage: 'HomePage')
-              : HomePageWidget(),
+              : const HomePageWidget(),
         ),
         FFRoute(
             name: TicketListWidget.routeName,
@@ -133,21 +134,21 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           path: ProfileWidget.routePath,
           builder: (context, params) => params.isEmpty
               ? NavBarPage(initialPage: 'Profile')
-              : ProfileWidget(),
+              : const ProfileWidget(),
         ),
         FFRoute(
           name: ChatPageWidget.routeName,
           path: ChatPageWidget.routePath,
           builder: (context, params) => params.isEmpty
               ? NavBarPage(initialPage: 'chatPage')
-              : ChatPageWidget(),
+              : const ChatPageWidget(),
         ),
         FFRoute(
           name: QRCodeWidget.routeName,
           path: QRCodeWidget.routePath,
           builder: (context, params) => params.isEmpty
               ? NavBarPage(initialPage: 'QRCode')
-              : QRCodeWidget(),
+              : const QRCodeWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
@@ -382,7 +383,8 @@ class TransitionInfo {
   final Duration duration;
   final Alignment? alignment;
 
-  static TransitionInfo appDefault() => TransitionInfo(hasTransition: false);
+  static TransitionInfo appDefault() =>
+      const TransitionInfo(hasTransition: false);
 }
 
 class RootPageContext {

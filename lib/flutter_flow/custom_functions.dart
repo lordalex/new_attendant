@@ -11,8 +11,8 @@ import 'uploaded_file.dart';
 import '/auth/firebase_auth/auth_util.dart';
 
 List<String> jsontoArray(String jsonString) {
-  final String _fnName = "jsontoArray";
-  print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: START');
+  const String fnName = "jsontoArray";
+  print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: START');
 
   String printableJsonString;
   if (jsonString.length > 100) {
@@ -22,27 +22,27 @@ List<String> jsontoArray(String jsonString) {
     printableJsonString = '"$jsonString"';
   }
   print(
-    'FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Input jsonString: $printableJsonString',
+    'FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Input jsonString: $printableJsonString',
   );
 
   try {
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Attempting jsonDecode.');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Attempting jsonDecode.');
     final dynamic decodedJson = jsonDecode(jsonString);
     print(
-      'FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: jsonDecode successful. Type: ${decodedJson.runtimeType}.',
+      'FF_CUSTOM_FUNC_DEBUG: $fnName: L4: jsonDecode successful. Type: ${decodedJson.runtimeType}.',
     );
 
     if (decodedJson is! List) {
       print(
-        'FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Decoded JSON is not a List. Actual type: ${decodedJson.runtimeType}. Returning [].',
+        'FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Decoded JSON is not a List. Actual type: ${decodedJson.runtimeType}. Returning [].',
       );
-      print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: END (not a list)');
+      print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: END (not a list)');
       return [];
     }
 
     final List<dynamic> jsonList = decodedJson;
     print(
-      'FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Decoded JSON is a List. Items: ${jsonList.length}.',
+      'FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Decoded JSON is a List. Items: ${jsonList.length}.',
     );
 
     List<String> stringList = jsonList.map((item) {
@@ -56,22 +56,22 @@ List<String> jsontoArray(String jsonString) {
     }).toList();
 
     print(
-      'FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Mapping to List<String> complete. Result size: ${stringList.length}.',
+      'FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Mapping to List<String> complete. Result size: ${stringList.length}.',
     );
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: END (success)');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: END (success)');
     return stringList;
   } catch (e, s) {
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: ERROR CAUGHT.');
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Error Type: ${e.runtimeType}');
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Error: $e');
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: Stacktrace: $s');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: ERROR CAUGHT.');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Error Type: ${e.runtimeType}');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Error: $e');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: Stacktrace: $s');
 
     String errorMessage = 'Error: $e';
     if (errorMessage.length > 200) {
-      errorMessage = errorMessage.substring(0, 200) + "...";
+      errorMessage = "${errorMessage.substring(0, 200)}...";
     }
 
-    print('FF_CUSTOM_FUNC_DEBUG: $_fnName: L4: END (error)');
+    print('FF_CUSTOM_FUNC_DEBUG: $fnName: L4: END (error)');
     return [errorMessage];
   }
 }
@@ -106,8 +106,10 @@ String getkeyfromjsonstring(String string, String key) {
     // Helper function to check if two keys match (case-insensitive, camel/snake agnostic)
     bool keysMatch(String key1, String key2) {
       if (key1.toLowerCase() == key2.toLowerCase()) return true;
-      if (camelToSnake(key1).toLowerCase() == camelToSnake(key2).toLowerCase())
+      if (camelToSnake(key1).toLowerCase() ==
+          camelToSnake(key2).toLowerCase()) {
         return true;
+      }
       return false;
     }
 
@@ -276,7 +278,7 @@ String convertFirestoreTimestampToIso(String firestoreTimestampJson) {
 String getTimeDifferenceFromTicket(String ticketJson) {
   print("=== getTimeDifferenceFromTicket START ===");
   print(
-      "Input ticket JSON (first 100 chars): ${ticketJson.length > 100 ? ticketJson.substring(0, 100) + '...' : ticketJson}");
+      "Input ticket JSON (first 100 chars): ${ticketJson.length > 100 ? '${ticketJson.substring(0, 100)}...' : ticketJson}");
 
   try {
     // Step 1: Get the created_at timestamp from the ticket
@@ -438,7 +440,7 @@ String formatVehicleDisplay(String vehicleJson) {
 }
 
 String extractTime(String timeStr) {
-  if (timeStr == null || timeStr.trim().isEmpty) {
+  if (timeStr.trim().isEmpty) {
     print(
       "[INPUT_EVALUATION] ⛔ Input is null or empty. Aborting processing.",
     );
@@ -585,7 +587,7 @@ String extractTime(String timeStr) {
     try {
       print("[4/6] Formatting date...");
       String month = DateFormat('MMMM').format(utcDate);
-      formattedDate = '${month} '
+      formattedDate = '$month '
           '${utcDate.day}, ${utcDate.year}';
       print("✅ Date formatted: $formattedDate");
     } catch (formatError, stackTrace) {

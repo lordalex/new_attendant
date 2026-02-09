@@ -37,8 +37,8 @@ class SlidableTileTicketListParkedWidget extends StatefulWidget {
     this.ticketJson,
     this.apiUrl,
     this.idToken,
-  })  : this.timeTextColor = timeTextColor ?? const Color(0xFF57636C),
-        this.timerTimeIntegerMs = timerTimeIntegerMs ?? 0;
+  })  : timeTextColor = timeTextColor ?? const Color(0xFF57636C),
+        timerTimeIntegerMs = timerTimeIntegerMs ?? 0;
 
   final String? name;
   final String? plate;
@@ -80,10 +80,10 @@ class _SlidableTileTicketListParkedWidgetState
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       // NEW: Parse ticket JSON and fetch vehicle data
-      if (widget!.ticketJson != null && widget!.ticketJson!.isNotEmpty) {
+      if (widget.ticketJson != null && widget.ticketJson!.isNotEmpty) {
         try {
           print("[SlidableTile] Parsing ticket JSON");
-          _model.ticket = Ticket.fromJson(widget!.ticketJson!);
+          _model.ticket = Ticket.fromJson(widget.ticketJson!);
 
           // Calculate time difference
           _model.timeDifferenceText = _model.ticket!.timeDifference;
@@ -99,13 +99,13 @@ class _SlidableTileTicketListParkedWidgetState
           }
 
           // Fetch vehicle data if available
-          if (widget!.apiUrl != null &&
-              widget!.idToken != null &&
+          if (widget.apiUrl != null &&
+              widget.idToken != null &&
               _model.ticket!.vehicle.isNotEmpty) {
             print("[SlidableTile] Fetching vehicle data");
             final vehicleService = VehicleService(
-              apiUrl: widget!.apiUrl!,
-              idToken: widget!.idToken!,
+              apiUrl: widget.apiUrl!,
+              idToken: widget.idToken!,
             );
 
             final vehicleData = await vehicleService
@@ -134,16 +134,22 @@ class _SlidableTileTicketListParkedWidgetState
         _model.vehicleDisplayText = "Vehicle info unavailable";
       }
       _model.timerController.timer.setPresetTime(
-        mSec: widget!.timerTimeIntegerMs,
+        mSec: widget.timerTimeIntegerMs,
         add: false,
       );
       _model.timerController.onResetTimer();
 
       _model.timerController.onStartTimer();
-      _model.clientPhoto = await actions.base64toBytesAction(
-        widget!.profileImg!,
-        'clientPhoto',
-      );
+      // Only load from profileImg if ticket JSON didn't already load a photo
+      if (_model.clientPhoto == null || (_model.clientPhoto?.bytes?.isEmpty ?? true)) {
+        if (widget.profileImg != null && widget.profileImg != '' && widget.profileImg != 'error') {
+          _model.clientPhoto = await actions.base64toBytesAction(
+            widget.profileImg!,
+            'clientPhoto',
+          );
+        }
+      }
+      safeSetState(() {});
     });
 
     animationsMap.addAll({
@@ -155,8 +161,8 @@ class _SlidableTileTicketListParkedWidgetState
             curve: Curves.elasticOut,
             delay: 0.0.ms,
             duration: 900.0.ms,
-            begin: Offset(0.0, 0.0),
-            end: Offset(-100.0, 0.0),
+            begin: const Offset(0.0, 0.0),
+            end: const Offset(-100.0, 0.0),
           ),
           FadeEffect(
             curve: Curves.easeInOut,
@@ -197,13 +203,13 @@ class _SlidableTileTicketListParkedWidgetState
                 .forward();
           }
           await Future.delayed(
-            Duration(
+            const Duration(
               milliseconds: 150,
             ),
           );
           await widget.callback?.call();
           FFAppState().isTicketOn = true;
-          FFAppState().ticketNumber = widget!.ticketNumber!;
+          FFAppState().ticketNumber = widget.ticketNumber!;
           safeSetState(() {});
         }
         _model.posx = details.localPosition.dx;
@@ -222,11 +228,11 @@ class _SlidableTileTicketListParkedWidgetState
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding:
-                      EdgeInsetsDirectional.fromSTEB(15.0, 10.0, 10.0, 15.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      15.0, 10.0, 10.0, 15.0),
                   child: Container(
-                    width: 87.5,
-                    height: 77.3,
+                    width: 70.0,
+                    height: 70.0,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).primary,
                       borderRadius: BorderRadius.circular(4.0),
@@ -237,6 +243,16 @@ class _SlidableTileTicketListParkedWidgetState
                     ),
                     child: Stack(
                       children: [
+                        // Default image shown when no photo loaded
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.asset(
+                            'assets/images/image-default.jpg',
+                            width: double.infinity,
+                            height: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                         if (_model.clientPhoto != null &&
                             (_model.clientPhoto?.bytes?.isNotEmpty ?? false))
                           InkWell(
@@ -297,23 +313,21 @@ class _SlidableTileTicketListParkedWidgetState
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 7.0, 5.0, 7.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 7.0, 5.0, 7.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Align(
-                          alignment: AlignmentDirectional(-1.0, 0.0),
-                          child: Container(
-                            width: MediaQuery.sizeOf(context).width * 0.464,
-                            decoration: BoxDecoration(),
-                            child: Column(
+                          alignment: const AlignmentDirectional(-1.0, 0.0),
+                          child: Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   valueOrDefault<String>(
-                                    widget!.name,
+                                    widget.name,
                                     'error',
                                   ),
                                   textAlign: TextAlign.start,
@@ -343,10 +357,11 @@ class _SlidableTileTicketListParkedWidgetState
                                 // Display time difference
                                 if (_model.timeDifferenceText != null)
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 4.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 4.0, 0.0, 0.0),
                                     child: Container(
-                                      padding: EdgeInsets.symmetric(
+                                      padding: const EdgeInsets.symmetric(
                                           horizontal: 8.0, vertical: 2.0),
                                       decoration: BoxDecoration(
                                         color: Colors.blue[50],
@@ -366,14 +381,15 @@ class _SlidableTileTicketListParkedWidgetState
                                 // Display vehicle info
                                 if (_model.vehicleDisplayText != null)
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 4.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 4.0, 0.0, 0.0),
                                     child: Row(
                                       children: [
                                         Icon(Icons.directions_car,
                                             size: 14.0,
                                             color: Colors.grey[600]),
-                                        SizedBox(width: 4.0),
+                                        const SizedBox(width: 4.0),
                                         Expanded(
                                           child: Text(
                                             _model.isLoadingVehicle
@@ -396,15 +412,14 @@ class _SlidableTileTicketListParkedWidgetState
                                   ),
                               ],
                             ),
-                          ),
                         ),
                         Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 5.0, 0.0, 0.0),
                           child: Container(
                             height: MediaQuery.sizeOf(context).height * 0.059,
                             decoration: BoxDecoration(
-                              color: Color(0x1E131919),
+                              color: const Color(0x1E131919),
                               borderRadius: BorderRadius.circular(5.0),
                               border: Border.all(
                                 color:
@@ -412,10 +427,10 @@ class _SlidableTileTicketListParkedWidgetState
                               ),
                             ),
                             child: Align(
-                              alignment: AlignmentDirectional(0.0, 0.0),
+                              alignment: const AlignmentDirectional(0.0, 0.0),
                               child: Text(
                                 valueOrDefault<String>(
-                                  widget!.plate,
+                                  widget.plate,
                                   'error',
                                 ),
                                 style: FlutterFlowTheme.of(context)
@@ -444,27 +459,23 @@ class _SlidableTileTicketListParkedWidgetState
                     ),
                   ),
                 ),
-                Expanded(
+                SizedBox(
+                  width: 130.0,
                   child: Column(
-                    mainAxisSize: MainAxisSize.max,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Align(
-                        alignment: AlignmentDirectional(1.0, 0.0),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                      Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 0.0, 5.0, 0.0),
-                          child: Container(
-                            width: 120.0,
-                            decoration: BoxDecoration(),
-                            child: Row(
+                          child: Row(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 FaIcon(
                                   FontAwesomeIcons.solidClock,
                                   color: valueOrDefault<Color>(
-                                    widget!.timerTimeIntegerMs >= 300000
-                                        ? Color(0xFFA50707)
+                                    widget.timerTimeIntegerMs >= 300000
+                                        ? const Color(0xFFA50707)
                                         : FlutterFlowTheme.of(context)
                                             .primaryText,
                                     FlutterFlowTheme.of(context).primary,
@@ -478,8 +489,8 @@ class _SlidableTileTicketListParkedWidgetState
                                         CrossAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            6.0, 0.0, 0.0, 0.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(6.0, 0.0, 0.0, 0.0),
                                         child: FlutterFlowTimer(
                                           initialTime:
                                               _model.timerInitialTimeMs,
@@ -490,14 +501,15 @@ class _SlidableTileTicketListParkedWidgetState
                                             milliSecond: false,
                                           ),
                                           controller: _model.timerController,
-                                          updateStateInterval:
-                                              Duration(milliseconds: 1000),
+                                          updateStateInterval: const Duration(
+                                              milliseconds: 1000),
                                           onChanged: (value, displayTime,
                                               shouldUpdate) {
                                             _model.timerMilliseconds = value;
                                             _model.timerValue = displayTime;
-                                            if (shouldUpdate)
+                                            if (shouldUpdate) {
                                               safeSetState(() {});
+                                            }
                                           },
                                           textAlign: TextAlign.start,
                                           style: FlutterFlowTheme.of(context)
@@ -507,9 +519,10 @@ class _SlidableTileTicketListParkedWidgetState
                                                     FlutterFlowTheme.of(context)
                                                         .headlineSmallFamily,
                                                 color:
-                                                    widget!.timerTimeIntegerMs >=
+                                                    widget.timerTimeIntegerMs >=
                                                             300000
-                                                        ? Color(0xFFA50707)
+                                                        ? const Color(
+                                                            0xFFA50707)
                                                         : FlutterFlowTheme.of(
                                                                 context)
                                                             .primaryText,
@@ -527,114 +540,93 @@ class _SlidableTileTicketListParkedWidgetState
                                 ),
                               ],
                             ),
-                          ),
-                        ),
                       ),
-                      Align(
-                        alignment: AlignmentDirectional(1.0, 0.0),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 0.0, 5.0, 0.0),
-                          child: Container(
-                            width: 120.0,
-                            decoration: BoxDecoration(),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  0.0, 3.0, 0.0, 3.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  FaIcon(
-                                    FontAwesomeIcons.key,
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                    size: 17.0,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        4.0, 0.0, 0.0, 0.0),
-                                    child: Text(
-                                      functions.tostr(valueOrDefault<String>(
-                                        widget!.lockerSpace,
-                                        'n/a',
-                                      )),
-                                      textAlign: TextAlign.start,
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            font: GoogleFonts.roboto(
-                                              fontWeight: FontWeight.w500,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
-                                            fontSize: 15.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w500,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 3.0, 5.0, 3.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            FaIcon(
+                              FontAwesomeIcons.key,
+                              color: FlutterFlowTheme.of(context).primaryText,
+                              size: 17.0,
+                            ),
+                            Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  4.0, 0.0, 0.0, 0.0),
+                              child: Text(
+                                functions.tostr(valueOrDefault<String>(
+                                  widget.lockerSpace,
+                                  'n/a',
+                                )),
+                                textAlign: TextAlign.start,
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      font: GoogleFonts.roboto(
+                                        fontWeight: FontWeight.w500,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                      fontSize: 15.0,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle:
+                                          FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .fontStyle,
                                     ),
-                                  ),
-                                ],
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                      Align(
-                        alignment: AlignmentDirectional(1.0, 0.0),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 3.0, 5.0, 3.0),
-                          child: Container(
-                            width: 120.0,
-                            decoration: BoxDecoration(),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                FaIcon(
-                                  FontAwesomeIcons.car,
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  size: 17.0,
-                                ),
-                                Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      4.0, 0.0, 0.0, 0.0),
-                                  child: Text(
-                                    functions.tostr(valueOrDefault<String>(
-                                      widget!.parkingSpace,
-                                      'n/a',
-                                    )),
-                                    textAlign: TextAlign.start,
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          font: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.w500,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
-                                          fontSize: 15.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
-                                        ),
-                                  ),
-                                ),
-                              ],
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 3.0, 5.0, 3.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            FaIcon(
+                              FontAwesomeIcons.car,
+                              color: FlutterFlowTheme.of(context).primary,
+                              size: 17.0,
                             ),
-                          ),
+                            Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  4.0, 0.0, 0.0, 0.0),
+                              child: Text(
+                                functions.tostr(valueOrDefault<String>(
+                                  widget.parkingSpace,
+                                  'n/a',
+                                )),
+                                textAlign: TextAlign.start,
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyMedium
+                                    .override(
+                                      font: GoogleFonts.roboto(
+                                        fontWeight: FontWeight.w500,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                      fontSize: 15.0,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle:
+                                          FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .fontStyle,
+                                    ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

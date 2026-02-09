@@ -35,9 +35,9 @@ class SlidableTileTicketListArrivalWidget extends StatefulWidget {
     this.ticketJson,
     this.apiUrl,
     this.idToken,
-  })  : this.timeTextColor = timeTextColor ?? const Color(0xFF57636C),
-        this.timerTimeIntegerMs = timerTimeIntegerMs ?? 0,
-        this.vehicleInfo = vehicleInfo ?? ' ';
+  })  : timeTextColor = timeTextColor ?? const Color(0xFF57636C),
+        timerTimeIntegerMs = timerTimeIntegerMs ?? 0,
+        vehicleInfo = vehicleInfo ?? ' ';
 
   final String? name;
   final String? plate;
@@ -85,7 +85,7 @@ class _SlidableTileTicketListArrivalWidgetState
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       _model.timerController.timer.setPresetTime(
-        mSec: widget!.timerTimeIntegerMs,
+        mSec: widget.timerTimeIntegerMs,
         add: false,
       );
       _model.timerController.onResetTimer();
@@ -93,10 +93,10 @@ class _SlidableTileTicketListArrivalWidgetState
       _model.timerController.onStartTimer();
 
       // NEW: Parse ticket JSON and fetch vehicle data
-      if (widget!.ticketJson != null && widget!.ticketJson!.isNotEmpty) {
+      if (widget.ticketJson != null && widget.ticketJson!.isNotEmpty) {
         try {
           print("[SlidableTile] Parsing ticket JSON");
-          _model.ticket = Ticket.fromJson(widget!.ticketJson!);
+          _model.ticket = Ticket.fromJson(widget.ticketJson!);
 
           // Calculate time difference
           _model.timeDifferenceText = _model.ticket!.timeDifference;
@@ -120,14 +120,14 @@ class _SlidableTileTicketListArrivalWidgetState
           }
 
           // Fetch vehicle data if available
-          if (widget!.apiUrl != null &&
-              widget!.idToken != null &&
+          if (widget.apiUrl != null &&
+              widget.idToken != null &&
               _model.ticket!.vehicle.isNotEmpty) {
             print(
                 "[SlidableTile] Fetching vehicle data for: ${_model.ticket!.vehicle}");
             final vehicleService = VehicleService(
-              apiUrl: widget!.apiUrl!,
-              idToken: widget!.idToken!,
+              apiUrl: widget.apiUrl!,
+              idToken: widget.idToken!,
             );
 
             final vehicleData = await vehicleService
@@ -138,14 +138,14 @@ class _SlidableTileTicketListArrivalWidgetState
               _model.vehicleDisplayText = _model.ticket!.formattedVehicle;
             } else {
               print("[SlidableTile] Vehicle data not found");
-              _model.vehicleDisplayText = widget!.vehicleInfo != ' '
-                  ? widget!.vehicleInfo
+              _model.vehicleDisplayText = widget.vehicleInfo != ' '
+                  ? widget.vehicleInfo
                   : "Vehicle info unavailable";
             }
           } else {
             // Fallback to provided vehicleInfo
-            _model.vehicleDisplayText = widget!.vehicleInfo != ' '
-                ? widget!.vehicleInfo
+            _model.vehicleDisplayText = widget.vehicleInfo != ' '
+                ? widget.vehicleInfo
                 : "Vehicle info unavailable";
           }
 
@@ -155,14 +155,14 @@ class _SlidableTileTicketListArrivalWidgetState
           print("[SlidableTile] Error loading ticket data: $e");
           // Fallback to old behavior
           _model.isLoadingVehicle = false;
-          _model.vehicleDisplayText = widget!.vehicleInfo != ' '
-              ? widget!.vehicleInfo
+          _model.vehicleDisplayText = widget.vehicleInfo != ' '
+              ? widget.vehicleInfo
               : "Vehicle info unavailable";
           _model.timeDifferenceText = null;
 
-          if (widget!.profileImg != null && widget!.profileImg != '') {
+          if (widget.profileImg != null && widget.profileImg != '') {
             _model.clientPhoto1 = await actions.base64toBytesAction(
-              widget!.profileImg!,
+              widget.profileImg!,
               'clientPhoto',
             );
             _model.clientPhoto = _model.clientPhoto1;
@@ -178,9 +178,9 @@ class _SlidableTileTicketListArrivalWidgetState
       } else {
         // OLD BEHAVIOR: Use individual parameters
         print("[SlidableTile] Using legacy parameter mode");
-        if (widget!.profileImg != null && widget!.profileImg != '') {
+        if (widget.profileImg != null && widget.profileImg != '') {
           _model.clientPhoto1 = await actions.base64toBytesAction(
-            widget!.profileImg!,
+            widget.profileImg!,
             'clientPhoto',
           );
           _model.clientPhoto = _model.clientPhoto1;
@@ -194,8 +194,8 @@ class _SlidableTileTicketListArrivalWidgetState
           _model.updatePage(() {});
         }
         _model.isLoadingVehicle = false;
-        _model.vehicleDisplayText = widget!.vehicleInfo != ' '
-            ? widget!.vehicleInfo
+        _model.vehicleDisplayText = widget.vehicleInfo != ' '
+            ? widget.vehicleInfo
             : "Vehicle info unavailable";
       }
     });
@@ -209,8 +209,8 @@ class _SlidableTileTicketListArrivalWidgetState
             curve: Curves.elasticOut,
             delay: 0.0.ms,
             duration: 900.0.ms,
-            begin: Offset(0.0, 0.0),
-            end: Offset(-100.0, 0.0),
+            begin: const Offset(0.0, 0.0),
+            end: const Offset(-100.0, 0.0),
           ),
           FadeEffect(
             curve: Curves.easeInOut,
@@ -252,7 +252,7 @@ class _SlidableTileTicketListArrivalWidgetState
                 .forward();
           }
           await Future.delayed(
-            Duration(
+            const Duration(
               milliseconds: 150,
             ),
           );
@@ -274,11 +274,11 @@ class _SlidableTileTicketListArrivalWidgetState
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding:
-                      EdgeInsetsDirectional.fromSTEB(15.0, 10.0, 15.0, 15.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      15.0, 10.0, 15.0, 15.0),
                   child: Container(
-                    width: 60.0,
-                    height: 77.6,
+                    width: 70.0,
+                    height: 70.0,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).secondaryBackground,
                       borderRadius: BorderRadius.circular(15.0),
@@ -289,21 +289,21 @@ class _SlidableTileTicketListArrivalWidgetState
                               _model.clientPhoto!.bytes!.isNotEmpty)
                           ? Image.memory(
                               _model.clientPhoto!.bytes!,
-                              width: 207.4,
-                              height: 77.6,
+                              width: 70.0,
+                              height: 70.0,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
                                   Image.asset(
                                 'assets/images/error_image.png',
-                                width: 207.4,
-                                height: 77.6,
+                                width: 70.0,
+                                height: 70.0,
                                 fit: BoxFit.cover,
                               ),
                             )
                           : Image.asset(
                               'assets/images/image-default.jpg',
-                              width: 207.4,
-                              height: 77.6,
+                              width: 70.0,
+                              height: 70.0,
                               fit: BoxFit.cover,
                             ),
                     ),
@@ -311,21 +311,20 @@ class _SlidableTileTicketListArrivalWidgetState
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 7.0, 5.0, 7.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 7.0, 5.0, 7.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Align(
-                          alignment: AlignmentDirectional(-1.0, 0.0),
-                          child: Container(
-                            width: MediaQuery.sizeOf(context).width * 0.464,
-                            decoration: BoxDecoration(),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
+                          alignment: const AlignmentDirectional(-1.0, 0.0),
+                          child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  widget!.date!,
+                                  widget.date!,
                                   textAlign: TextAlign.start,
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
@@ -353,10 +352,11 @@ class _SlidableTileTicketListArrivalWidgetState
                                 // NEW: Display time difference
                                 if (_model.timeDifferenceText != null)
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 4.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 4.0, 0.0, 0.0),
                                     child: Container(
-                                      padding: EdgeInsets.symmetric(
+                                      padding: const EdgeInsets.symmetric(
                                           horizontal: 8.0, vertical: 2.0),
                                       decoration: BoxDecoration(
                                         color: Colors.blue[50],
@@ -376,8 +376,9 @@ class _SlidableTileTicketListArrivalWidgetState
                                 // NEW: Display vehicle info
                                 if (_model.vehicleDisplayText != null)
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 4.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 4.0, 0.0, 0.0),
                                     child: Row(
                                       children: [
                                         Icon(
@@ -385,7 +386,7 @@ class _SlidableTileTicketListArrivalWidgetState
                                           size: 14.0,
                                           color: Colors.grey[600],
                                         ),
-                                        SizedBox(width: 4.0),
+                                        const SizedBox(width: 4.0),
                                         Expanded(
                                           child: Text(
                                             _model.isLoadingVehicle
@@ -407,13 +408,14 @@ class _SlidableTileTicketListArrivalWidgetState
                                     ),
                                   ),
                                 // NEW: Display plate if available
-                                if (widget!.plate != null &&
-                                    widget!.plate!.isNotEmpty)
+                                if (widget.plate != null &&
+                                    widget.plate!.isNotEmpty)
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 2.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 2.0, 0.0, 0.0),
                                     child: Text(
-                                      "Plate: ${widget!.plate}",
+                                      "Plate: ${widget.plate}",
                                       style: TextStyle(
                                         fontSize: 11.0,
                                         color: Colors.grey[600],
@@ -422,13 +424,15 @@ class _SlidableTileTicketListArrivalWidgetState
                                     ),
                                   ),
                                 Align(
-                                  alignment: AlignmentDirectional(0.0, 0.0),
+                                  alignment:
+                                      const AlignmentDirectional(0.0, 0.0),
                                   child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 18.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 18.0, 0.0, 0.0),
                                     child: Text(
                                       valueOrDefault<String>(
-                                        widget!.name,
+                                        widget.name,
                                         'FULL NAME',
                                       ),
                                       style: FlutterFlowTheme.of(context)
@@ -456,29 +460,29 @@ class _SlidableTileTicketListArrivalWidgetState
                                 ),
                               ],
                             ),
-                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                Expanded(
+                SizedBox(
+                  width: 130.0,
                   child: Align(
-                    alignment: AlignmentDirectional(1.0, 0.0),
+                    alignment: const AlignmentDirectional(1.0, 0.0),
                     child: Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 5.0, 0.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 5.0, 0.0),
                       child: Container(
                         width: 120.0,
-                        decoration: BoxDecoration(),
+                        decoration: const BoxDecoration(),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             FaIcon(
                               FontAwesomeIcons.solidClock,
-                              color: widget!.timerTimeIntegerMs >= 300000
-                                  ? Color(0xFFA50707)
+                              color: widget.timerTimeIntegerMs >= 300000
+                                  ? const Color(0xFFA50707)
                                   : FlutterFlowTheme.of(context).primaryText,
                               size: 17.0,
                             ),
@@ -488,8 +492,9 @@ class _SlidableTileTicketListArrivalWidgetState
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        6.0, 0.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            6.0, 0.0, 0.0, 0.0),
                                     child: FlutterFlowTimer(
                                       initialTime: _model.timerInitialTimeMs,
                                       getDisplayTime: (value) =>
@@ -500,7 +505,7 @@ class _SlidableTileTicketListArrivalWidgetState
                                       ),
                                       controller: _model.timerController,
                                       updateStateInterval:
-                                          Duration(milliseconds: 1000),
+                                          const Duration(milliseconds: 1000),
                                       onChanged:
                                           (value, displayTime, shouldUpdate) {
                                         _model.timerMilliseconds = value;
@@ -514,9 +519,9 @@ class _SlidableTileTicketListArrivalWidgetState
                                             fontFamily:
                                                 FlutterFlowTheme.of(context)
                                                     .headlineSmallFamily,
-                                            color: widget!.timerTimeIntegerMs >=
+                                            color: widget.timerTimeIntegerMs >=
                                                     300000
-                                                ? Color(0xFFA50707)
+                                                ? const Color(0xFFA50707)
                                                 : FlutterFlowTheme.of(context)
                                                     .primaryText,
                                             fontSize: 22.0,

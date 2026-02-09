@@ -9,12 +9,12 @@ class TicketCard extends StatefulWidget {
   final VoidCallback? onTap;
 
   const TicketCard({
-    Key? key,
+    super.key,
     required this.ticketJson,
     required this.apiUrl,
     required this.idToken,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   State<TicketCard> createState() => _TicketCardState();

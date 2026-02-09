@@ -1,25 +1,9 @@
-import '/auth/firebase_auth/auth_util.dart';
-import '/components/empty_component_list_view/empty_component_list_view_widget.dart';
-import '/components/slidables/slidable_tile_ticket_list_arrival/slidable_tile_ticket_list_arrival_widget.dart';
-import '/components/slidables/slidable_tile_ticket_list_completed/slidable_tile_ticket_list_completed_widget.dart';
-import '/components/slidables/slidable_tile_ticket_list_departure/slidable_tile_ticket_list_departure_widget.dart';
-import '/components/slidables/slidable_tile_ticket_list_parked/slidable_tile_ticket_list_parked_widget.dart';
-import '/components/slidables/slidable_tile_ticket_list_processing/slidable_tile_ticket_list_processing_widget.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/instant_timer.dart';
 import 'dart:async';
-import 'dart:ui';
-import '/custom_code/actions/index.dart' as actions;
-import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'ticket_list_widget.dart' show TicketListWidget;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
-import 'package:provider/provider.dart';
 import '../services/http_request_manager.dart';
 
 class TicketListModel extends FlutterFlowModel<TicketListWidget> {
@@ -80,10 +64,10 @@ class TicketListModel extends FlutterFlowModel<TicketListWidget> {
   bool _pendingRefresh = false;
   StreamSubscription<bool>? _httpStateSubscription;
   DateTime? _lastFetchTime;
-  
+
   /// Minimum interval between fetches (to prevent too frequent calls)
   static const Duration _minFetchInterval = Duration(seconds: 3);
-  
+
   /// Getters for polling state
   bool get isVisible => _isVisible;
   bool get isPaused => _isPaused;
@@ -94,7 +78,8 @@ class TicketListModel extends FlutterFlowModel<TicketListWidget> {
   @override
   void initState(BuildContext context) {
     // Subscribe to HTTP request state changes
-    _httpStateSubscription = HttpRequestManager().requestStateStream.listen((isBusy) {
+    _httpStateSubscription =
+        HttpRequestManager().requestStateStream.listen((isBusy) {
       _isHttpBusy = isBusy;
       if (isBusy) {
         // Pause polling when HTTP requests are in flight
@@ -117,7 +102,7 @@ class TicketListModel extends FlutterFlowModel<TicketListWidget> {
   void onResume() {
     _isVisible = true;
     print('[TicketList] Screen resumed');
-    
+
     // If we have a pending refresh or data is stale, refresh immediately
     if (_pendingRefresh || _isDataStale()) {
       _pendingRefresh = false;
@@ -140,7 +125,8 @@ class TicketListModel extends FlutterFlowModel<TicketListWidget> {
   void pausePolling() {
     if (!_isPaused) {
       _isPaused = true;
-      print('[TicketList] Polling paused (HTTP busy: $_isHttpBusy, Visible: $_isVisible)');
+      print(
+          '[TicketList] Polling paused (HTTP busy: $_isHttpBusy, Visible: $_isVisible)');
     }
   }
 
@@ -155,7 +141,8 @@ class TicketListModel extends FlutterFlowModel<TicketListWidget> {
   /// Check if data is stale (last fetch was more than 10 seconds ago)
   bool _isDataStale() {
     if (_lastFetchTime == null) return true;
-    return DateTime.now().difference(_lastFetchTime!) > const Duration(seconds: 10);
+    return DateTime.now().difference(_lastFetchTime!) >
+        const Duration(seconds: 10);
   }
 
   /// Update last fetch time
@@ -166,7 +153,7 @@ class TicketListModel extends FlutterFlowModel<TicketListWidget> {
   /// Check if we can perform a fetch (respects minimum interval)
   bool shouldFetch() {
     if (!canFetch) return false;
-    
+
     // Check minimum interval
     if (_lastFetchTime != null) {
       final timeSinceLastFetch = DateTime.now().difference(_lastFetchTime!);
@@ -174,7 +161,7 @@ class TicketListModel extends FlutterFlowModel<TicketListWidget> {
         return false;
       }
     }
-    
+
     return true;
   }
 

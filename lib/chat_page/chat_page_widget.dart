@@ -67,7 +67,7 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                       !FlutterFlowTheme.of(context).headlineMediumIsCustom,
                 ),
           ),
-          actions: [],
+          actions: const [],
           centerTitle: false,
           elevation: 2.0,
         ),
@@ -81,7 +81,7 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                 child: wrapWithModel(
                   model: _model.messagesModel,
                   updateCallback: () => safeSetState(() {}),
-                  child: MessagesWidget(),
+                  child: const MessagesWidget(),
                 ),
               ),
               Container(
@@ -94,7 +94,7 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         width: 200.0,
                         child: TextFormField(
                           controller: _model.messageTextTextController,
@@ -123,14 +123,14 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                                       .labelMediumIsCustom,
                                 ),
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: Color(0x00000000),
                                 width: 1.0,
                               ),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: Color(0x00000000),
                                 width: 1.0,
                               ),
@@ -181,7 +181,7 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                       onPressed: () async {
                         _model.responseMessage = await actions.sendjsontourl(
                           '{\"destinatary\": \"\", \"message\": \"${_model.messageTextTextController.text}\"}',
-                          currentJwtToken!,
+                          currentJwtToken,
                           FFAppConstants.postMessage,
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -192,7 +192,7 @@ class _ChatPageWidgetState extends State<ChatPageWidget> {
                                 color: FlutterFlowTheme.of(context).primaryText,
                               ),
                             ),
-                            duration: Duration(milliseconds: 4000),
+                            duration: const Duration(milliseconds: 4000),
                             backgroundColor:
                                 FlutterFlowTheme.of(context).secondary,
                           ),

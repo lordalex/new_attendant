@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 abstract class FFAppConstants {
   /// Base URL for all API endpoints
   static const String baseUrl = 'https://api.knex-app.xyz/api';

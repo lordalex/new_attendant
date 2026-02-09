@@ -42,12 +42,12 @@ class _EmptyComponentListViewWidgetState
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: AlignmentDirectional(0.0, 0.0),
+      alignment: const AlignmentDirectional(0.0, 0.0),
       child: Container(
-        decoration: BoxDecoration(),
-        alignment: AlignmentDirectional(0.0, 0.0),
+        decoration: const BoxDecoration(),
+        alignment: const AlignmentDirectional(0.0, 0.0),
         child: Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(0.0, 50.0, 0.0, 0.0),
+          padding: const EdgeInsetsDirectional.fromSTEB(0.0, 50.0, 0.0, 0.0),
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -58,7 +58,8 @@ class _EmptyComponentListViewWidgetState
                 size: 72.0,
               ),
               Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
                 child: Text(
                   'No Tickets',
                   style: FlutterFlowTheme.of(context).headlineMedium.override(
@@ -71,7 +72,8 @@ class _EmptyComponentListViewWidgetState
                 ),
               ),
               Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
                 child: Text(
                   'No tickets found',
                   textAlign: TextAlign.center,

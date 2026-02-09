@@ -11,7 +11,7 @@ Future<String> fetchVehicleDetails(
   String apiUrl,
   String idToken,
 ) async {
-  if (vehicleId == null || vehicleId.isEmpty || vehicleId == "error") {
+  if (vehicleId.isEmpty || vehicleId == "error") {
     print("[fetchVehicleDetails] Invalid vehicle ID: $vehicleId");
     return jsonEncode({
       'error': 'INVALID_VEHICLE_ID',
@@ -64,7 +64,8 @@ Future<String> fetchVehicleDetails(
     final vehicleData =
         (result['results'] as List).first as Map<String, dynamic>;
 
-    print("[fetchVehicleDetails] Success: ${vehicleData['model'] ?? vehicleData['vehicle_model'] ?? 'Unknown'}");
+    print(
+        "[fetchVehicleDetails] Success: ${vehicleData['model'] ?? vehicleData['vehicle_model'] ?? 'Unknown'}");
 
     // Return relevant vehicle fields per OpenAPI spec
     return jsonEncode({

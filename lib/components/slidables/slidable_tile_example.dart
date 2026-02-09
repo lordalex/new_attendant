@@ -11,11 +11,11 @@ class SlidableTileTicketListArrivalWidget extends StatefulWidget {
   final String idToken;
 
   const SlidableTileTicketListArrivalWidget({
-    Key? key,
+    super.key,
     required this.ticketJson,
     required this.apiUrl,
     required this.idToken,
-  }) : super(key: key);
+  });
 
   @override
   State<SlidableTileTicketListArrivalWidget> createState() =>
@@ -102,27 +102,27 @@ class _SlidableTileTicketListArrivalWidgetState
 
             // ✅ VEHICLE INFO - Now working!
             if (isLoadingVehicle)
-              Row(
+              const Row(
                 children: [
                   SizedBox(
                     width: 12,
                     height: 12,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Text("Loading vehicle...", style: TextStyle(fontSize: 12)),
                 ],
               )
             else if (errorMessage != null)
               Text(
                 errorMessage!,
-                style: TextStyle(color: Colors.red, fontSize: 12),
+                style: const TextStyle(color: Colors.red, fontSize: 12),
               )
             else
               Text(
                 ticket
                     .formattedVehicle, // "2023 Toyota Camry - Silver (CA-ABC123)"
-                style: TextStyle(fontWeight: FontWeight.w500),
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
 
             // ✅ CLIENT EMAIL

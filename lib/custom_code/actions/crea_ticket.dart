@@ -23,12 +23,12 @@ class ticketdataResponse {
   });
 
   Map<String, dynamic> toJson() => {
-    'success': success,
-    'message': message,
-    if (data != null) 'data': data,
-    if (error != null) 'error': error,
-    if (statusCode != null) 'statusCode': statusCode,
-  };
+        'success': success,
+        'message': message,
+        if (data != null) 'data': data,
+        if (error != null) 'error': error,
+        if (statusCode != null) 'statusCode': statusCode,
+      };
 }
 
 // Simplified logging
@@ -57,7 +57,7 @@ class InputValidator {
     try {
       final uri = Uri.parse(firebaseUrl);
       if (!uri.isAbsolute) {
-        throw FormatException('Invalid firebase URL format');
+        throw const FormatException('Invalid firebase URL format');
       }
     } catch (e) {
       throw FormatException('Invalid URL format: $e');

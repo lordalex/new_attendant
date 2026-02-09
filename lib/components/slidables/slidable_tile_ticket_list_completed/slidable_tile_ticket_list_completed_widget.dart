@@ -29,7 +29,7 @@ class SlidableTileTicketListCompletedWidget extends StatefulWidget {
     this.ticketJson,
     this.apiUrl,
     this.idToken,
-  }) : this.timeTextColor = timeTextColor ?? const Color(0xFF57636C);
+  }) : timeTextColor = timeTextColor ?? const Color(0xFF57636C);
 
   final String? plate;
   final String? profileImg;
@@ -68,10 +68,10 @@ class _SlidableTileTicketListCompletedWidgetState
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       // NEW: Parse ticket JSON and fetch vehicle data
-      if (widget!.ticketJson != null && widget!.ticketJson!.isNotEmpty) {
+      if (widget.ticketJson != null && widget.ticketJson!.isNotEmpty) {
         try {
           print("[SlidableTile] Parsing ticket JSON");
-          _model.ticket = Ticket.fromJson(widget!.ticketJson!);
+          _model.ticket = Ticket.fromJson(widget.ticketJson!);
 
           // Calculate time difference
           _model.timeDifferenceText = _model.ticket!.timeDifference;
@@ -87,13 +87,13 @@ class _SlidableTileTicketListCompletedWidgetState
           }
 
           // Fetch vehicle data if available
-          if (widget!.apiUrl != null &&
-              widget!.idToken != null &&
+          if (widget.apiUrl != null &&
+              widget.idToken != null &&
               _model.ticket!.vehicle.isNotEmpty) {
             print("[SlidableTile] Fetching vehicle data");
             final vehicleService = VehicleService(
-              apiUrl: widget!.apiUrl!,
-              idToken: widget!.idToken!,
+              apiUrl: widget.apiUrl!,
+              idToken: widget.idToken!,
             );
 
             final vehicleData = await vehicleService
@@ -121,10 +121,16 @@ class _SlidableTileTicketListCompletedWidgetState
         _model.isLoadingVehicle = false;
         _model.vehicleDisplayText = "Vehicle info unavailable";
       }
-      _model.clientPhoto = await actions.base64toBytesAction(
-        widget!.profileImg!,
-        'clientPhoto',
-      );
+      // Only load from profileImg if ticket JSON didn't already load a photo
+      if (_model.clientPhoto == null || (_model.clientPhoto?.bytes?.isEmpty ?? true)) {
+        if (widget.profileImg != null && widget.profileImg != '' && widget.profileImg != 'error') {
+          _model.clientPhoto = await actions.base64toBytesAction(
+            widget.profileImg!,
+            'clientPhoto',
+          );
+        }
+      }
+      safeSetState(() {});
     });
 
     animationsMap.addAll({
@@ -136,8 +142,8 @@ class _SlidableTileTicketListCompletedWidgetState
             curve: Curves.elasticOut,
             delay: 0.0.ms,
             duration: 900.0.ms,
-            begin: Offset(0.0, 0.0),
-            end: Offset(-100.0, 0.0),
+            begin: const Offset(0.0, 0.0),
+            end: const Offset(-100.0, 0.0),
           ),
           FadeEffect(
             curve: Curves.easeInOut,
@@ -176,13 +182,13 @@ class _SlidableTileTicketListCompletedWidgetState
                 .forward();
           }
           await Future.delayed(
-            Duration(
+            const Duration(
               milliseconds: 150,
             ),
           );
           await widget.callback?.call();
           FFAppState().isTicketOn = true;
-          FFAppState().ticketNumber = widget!.ticketNumber!;
+          FFAppState().ticketNumber = widget.ticketNumber!;
           safeSetState(() {});
         }
         _model.posx = details.localPosition.dx;
@@ -201,11 +207,11 @@ class _SlidableTileTicketListCompletedWidgetState
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding:
-                      EdgeInsetsDirectional.fromSTEB(15.0, 10.0, 15.0, 15.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      15.0, 10.0, 15.0, 15.0),
                   child: Container(
-                    width: 60.0,
-                    height: 58.1,
+                    width: 70.0,
+                    height: 70.0,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).secondaryBackground,
                       borderRadius: BorderRadius.circular(15.0),
@@ -216,21 +222,21 @@ class _SlidableTileTicketListCompletedWidgetState
                               _model.clientPhoto!.bytes!.isNotEmpty)
                           ? Image.memory(
                               _model.clientPhoto!.bytes!,
-                              width: 209.91,
-                              height: 215.5,
+                              width: 70.0,
+                              height: 70.0,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
                                   Image.asset(
                                 'assets/images/error_image.png',
-                                width: 209.91,
-                                height: 215.5,
+                                width: 70.0,
+                                height: 70.0,
                                 fit: BoxFit.cover,
                               ),
                             )
                           : Image.asset(
                               'assets/images/image-default.jpg',
-                              width: 209.91,
-                              height: 215.5,
+                              width: 70.0,
+                              height: 70.0,
                               fit: BoxFit.cover,
                             ),
                     ),
@@ -238,18 +244,19 @@ class _SlidableTileTicketListCompletedWidgetState
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 7.0, 5.0, 7.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 7.0, 5.0, 7.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 5.0, 0.0, 0.0),
                           child: Container(
                             height: MediaQuery.sizeOf(context).height * 0.071,
                             decoration: BoxDecoration(
-                              color: Color(0x1E131919),
+                              color: const Color(0x1E131919),
                               borderRadius: BorderRadius.circular(5.0),
                               border: Border.all(
                                 color:
@@ -257,10 +264,10 @@ class _SlidableTileTicketListCompletedWidgetState
                               ),
                             ),
                             child: Align(
-                              alignment: AlignmentDirectional(0.0, 0.0),
+                              alignment: const AlignmentDirectional(0.0, 0.0),
                               child: Text(
                                 valueOrDefault<String>(
-                                  widget!.plate,
+                                  widget.plate,
                                   'error',
                                 ),
                                 style: FlutterFlowTheme.of(context)
@@ -288,10 +295,10 @@ class _SlidableTileTicketListCompletedWidgetState
                         // Display time difference
                         if (_model.timeDifferenceText != null)
                           Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 4.0, 0.0, 0.0),
                             child: Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0, vertical: 2.0),
                               decoration: BoxDecoration(
                                 color: Colors.blue[50],
@@ -310,13 +317,13 @@ class _SlidableTileTicketListCompletedWidgetState
                         // Display vehicle info
                         if (_model.vehicleDisplayText != null)
                           Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 4.0, 0.0, 0.0),
                             child: Row(
                               children: [
                                 Icon(Icons.directions_car,
                                     size: 14.0, color: Colors.grey[600]),
-                                SizedBox(width: 4.0),
+                                const SizedBox(width: 4.0),
                                 Expanded(
                                   child: Text(
                                     _model.isLoadingVehicle
@@ -341,116 +348,103 @@ class _SlidableTileTicketListCompletedWidgetState
                     ),
                   ),
                 ),
-                Expanded(
+                SizedBox(
+                  width: 130.0,
                   child: Column(
-                    mainAxisSize: MainAxisSize.max,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Align(
-                        alignment: AlignmentDirectional(1.0, 0.0),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 0.0, 5.0, 0.0),
-                          child: Container(
-                            width: 120.0,
-                            decoration: BoxDecoration(),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                FaIcon(
-                                  FontAwesomeIcons.solidClock,
-                                  color: widget!.timeTextColor,
-                                  size: 17.0,
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        6.0, 0.0, 2.0, 0.0),
-                                    child: Text(
-                                      valueOrDefault<String>(
-                                        widget!.departureHour,
-                                        '00:00',
-                                      ),
-                                      textAlign: TextAlign.start,
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            font: GoogleFonts.roboto(
-                                              fontWeight: FontWeight.w800,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
-                                            color: widget!.timeTextColor,
-                                            fontSize: 21.5,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w800,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 0.0, 5.0, 0.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            FaIcon(
+                              FontAwesomeIcons.solidClock,
+                              color: widget.timeTextColor,
+                              size: 17.0,
                             ),
-                          ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    6.0, 0.0, 2.0, 0.0),
+                                child: Text(
+                                  valueOrDefault<String>(
+                                    widget.departureHour,
+                                    '00:00',
+                                  ),
+                                  textAlign: TextAlign.start,
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w800,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                        color: widget.timeTextColor,
+                                        fontSize: 22.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w800,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      Align(
-                        alignment: AlignmentDirectional(1.0, 0.0),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 0.0, 5.0, 0.0),
-                          child: Container(
-                            width: 120.0,
-                            decoration: BoxDecoration(),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                FaIcon(
-                                  FontAwesomeIcons.coins,
-                                  color: widget!.timeTextColor,
-                                  size: 17.0,
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        6.0, 0.0, 2.0, 0.0),
-                                    child: Text(
-                                      '\$${valueOrDefault<String>(
-                                        widget!.tipAmount,
-                                        '0',
-                                      )}',
-                                      textAlign: TextAlign.start,
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            font: GoogleFonts.roboto(
-                                              fontWeight: FontWeight.w800,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
-                                            color: widget!.timeTextColor,
-                                            fontSize: 21.5,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w800,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            0.0, 3.0, 5.0, 3.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            FaIcon(
+                              FontAwesomeIcons.coins,
+                              color: widget.timeTextColor,
+                              size: 17.0,
                             ),
-                          ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    6.0, 0.0, 2.0, 0.0),
+                                child: Text(
+                                  '\$${valueOrDefault<String>(
+                                    widget.tipAmount,
+                                    '0',
+                                  )}',
+                                  textAlign: TextAlign.start,
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w800,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                        color: widget.timeTextColor,
+                                        fontSize: 22.0,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w800,
+                                        fontStyle:
+                                            FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .fontStyle,
+                                      ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

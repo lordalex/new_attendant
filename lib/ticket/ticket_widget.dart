@@ -59,46 +59,44 @@ class _TicketWidgetState extends State<TicketWidget>
       _model.isLoaded = false;
       safeSetState(() {});
       // Clean the ticketID in case it has quotes
-      final cleanTicketId = (widget!.ticketID ?? '').replaceAll('"', '').trim();
-      
+      final cleanTicketId = (widget.ticketID ?? '').replaceAll('"', '').trim();
+
       _model.searchResultsTicket = await actions.sendjsontourl(
         '{"modelName": "Ticket", "searchCriteria": {"ticket_number": "$cleanTicketId"}}',
-        currentJwtToken!,
+        currentJwtToken,
         FFAppConstants.searchURL,
       );
-      
+
       // Safely extract location ID from the ticket and fetch site details
-      final locationId = functions.getkeyfromjsonstring(
-        _model.searchResultsTicket!,
-        'location',
-      ).replaceAll('"', '').trim();
-      
+      final locationId = functions
+          .getkeyfromjsonstring(
+            _model.searchResultsTicket!,
+            'location',
+          )
+          .replaceAll('"', '')
+          .trim();
+
       print('[TicketWidget] Location ID from ticket: $locationId');
-      
+
       // Only fetch site if we have a valid location ID
       if (locationId.isNotEmpty && locationId != 'null') {
         _model.ticketSiteId = await actions.sendjsontourl(
           '{"modelName": "Location", "searchCriteria": {"id": "$locationId"}}',
-          currentJwtToken!,
+          currentJwtToken,
           FFAppConstants.searchURL,
         );
-        print('[TicketWidget] Fetched location details: ${_model.ticketSiteId != null}');
+        print(
+            '[TicketWidget] Fetched location details: ${_model.ticketSiteId != null}');
       } else {
         print('[TicketWidget] No location ID found in ticket');
       }
-      
+
       if ((functions.getkeyfromjsonstring(
-                      _model.searchResultsTicket!, 'lockerSpace') !=
-                  null &&
-              functions.getkeyfromjsonstring(
-                      _model.searchResultsTicket!, 'lockerSpace') !=
-                  '') &&
+                  _model.searchResultsTicket!, 'lockerSpace') !=
+              '') &&
           (functions.getkeyfromjsonstring(
-                      _model.searchResultsTicket!, 'parkingSpace') !=
-                  null &&
-              functions.getkeyfromjsonstring(
-                      _model.searchResultsTicket!, 'parkingSpace') !=
-                  '')) {
+                  _model.searchResultsTicket!, 'parkingSpace') !=
+              '')) {
         _model.isTicketParked = true;
         safeSetState(() {});
       }
@@ -146,7 +144,7 @@ class _TicketWidgetState extends State<TicketWidget>
               color: FlutterFlowTheme.of(context).primaryText,
             ),
           ),
-          duration: Duration(milliseconds: 4000),
+          duration: const Duration(milliseconds: 4000),
           backgroundColor: FlutterFlowTheme.of(context).secondary,
         ),
       );
@@ -165,25 +163,29 @@ class _TicketWidgetState extends State<TicketWidget>
               _model.searchResultsTicket!, 'created_at')),
           'date');
       // Extract user_client ID directly (it's a string ID, not an object)
-      final userClientId = functions.getkeyfromjsonstring(
-        _model.searchResultsTicket!,
-        'user_client',
-      ).replaceAll('"', '').trim();
-      
+      final userClientId = functions
+          .getkeyfromjsonstring(
+            _model.searchResultsTicket!,
+            'user_client',
+          )
+          .replaceAll('"', '')
+          .trim();
+
       print('[TicketWidget] UserClient ID: $userClientId');
-      
+
       if (userClientId.isNotEmpty && userClientId != 'null') {
         _model.clientData = await actions.sendjsontourl(
           '{"modelName": "UserClient", "searchCriteria": {"id": "$userClientId"}}',
-          currentJwtToken!,
+          currentJwtToken,
           FFAppConstants.searchURL,
         );
-        
+
         // Extract firstname/lastname from insData JSON string
-        final insData = functions.getkeyfromjsonstring(_model.clientData!, 'insData');
+        final insData =
+            functions.getkeyfromjsonstring(_model.clientData!, 'insData');
         final firstName = functions.getkeyfromjsonstring(insData, 'firstName');
         final lastName = functions.getkeyfromjsonstring(insData, 'lastName');
-        
+
         _model.name = '$firstName $lastName'.trim();
         print('[TicketWidget] Client name: $_model.name');
         _model.isLoaded = true;
@@ -195,10 +197,8 @@ class _TicketWidgetState extends State<TicketWidget>
           _model.searchResultsTicket!, 'arrivalPhoto');
       if (arrivalPhotoJson.isNotEmpty && arrivalPhotoJson != 'null') {
         try {
-          _model.savedImagesArray = functions
-              .jsontoArray(arrivalPhotoJson)
-              .toList()
-              .cast<String>();
+          _model.savedImagesArray =
+              functions.jsontoArray(arrivalPhotoJson).toList().cast<String>();
         } catch (e) {
           print('[TicketWidget] Error parsing arrivalPhoto: $e');
           _model.savedImagesArray = [];
@@ -240,8 +240,8 @@ class _TicketWidgetState extends State<TicketWidget>
             curve: Curves.easeInOut,
             delay: 0.0.ms,
             duration: 600.0.ms,
-            begin: Offset(0.0, 50.0),
-            end: Offset(0.0, 0.0),
+            begin: const Offset(0.0, 50.0),
+            end: const Offset(0.0, 0.0),
           ),
         ],
       ),
@@ -260,8 +260,8 @@ class _TicketWidgetState extends State<TicketWidget>
             curve: Curves.easeInOut,
             delay: 120.0.ms,
             duration: 600.0.ms,
-            begin: Offset(0.0, 40.0),
-            end: Offset(0.0, 0.0),
+            begin: const Offset(0.0, 40.0),
+            end: const Offset(0.0, 0.0),
           ),
         ],
       ),
@@ -280,8 +280,8 @@ class _TicketWidgetState extends State<TicketWidget>
             curve: Curves.easeInOut,
             delay: 240.0.ms,
             duration: 600.0.ms,
-            begin: Offset(0.0, 70.0),
-            end: Offset(0.0, 0.0),
+            begin: const Offset(0.0, 70.0),
+            end: const Offset(0.0, 0.0),
           ),
         ],
       ),
@@ -300,8 +300,8 @@ class _TicketWidgetState extends State<TicketWidget>
             curve: Curves.bounceOut,
             delay: 600.0.ms,
             duration: 600.0.ms,
-            begin: Offset(0.7, 0.7),
-            end: Offset(1.0, 1.0),
+            begin: const Offset(0.7, 0.7),
+            end: const Offset(1.0, 1.0),
           ),
         ],
       ),
@@ -366,7 +366,8 @@ class _TicketWidgetState extends State<TicketWidget>
                   },
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(8.0, 0.0, 0.0, 0.0),
+                  padding:
+                      const EdgeInsetsDirectional.fromSTEB(8.0, 0.0, 0.0, 0.0),
                   child: Text(
                     'TICKET',
                     style: FlutterFlowTheme.of(context).headlineMedium.override(
@@ -382,7 +383,7 @@ class _TicketWidgetState extends State<TicketWidget>
                 ),
               ],
             ),
-            actions: [],
+            actions: const [],
             centerTitle: false,
             elevation: 2.0,
           ),
@@ -400,9 +401,9 @@ class _TicketWidgetState extends State<TicketWidget>
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Align(
-                              alignment: AlignmentDirectional(0.0, 0.0),
+                              alignment: const AlignmentDirectional(0.0, 0.0),
                               child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     16.0, 16.0, 16.0, 44.0),
                                 child: Material(
                                   color: Colors.transparent,
@@ -422,7 +423,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                         FlutterFlowTheme.of(context)
                                             .primaryBackground,
                                       ),
-                                      boxShadow: [
+                                      boxShadow: const [
                                         BoxShadow(
                                           blurRadius: 12.0,
                                           color: Color(0x33000000),
@@ -442,16 +443,16 @@ class _TicketWidgetState extends State<TicketWidget>
                                           CrossAxisAlignment.stretch,
                                       children: [
                                         Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  0.0, 0.0, 0.0, 16.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(0.0, 0.0, 0.0, 16.0),
                                           child: Container(
                                             width: 100.0,
                                             decoration: BoxDecoration(
                                               color:
                                                   FlutterFlowTheme.of(context)
                                                       .primary,
-                                              borderRadius: BorderRadius.only(
+                                              borderRadius:
+                                                  const BorderRadius.only(
                                                 bottomLeft:
                                                     Radius.circular(0.0),
                                                 bottomRight:
@@ -461,8 +462,9 @@ class _TicketWidgetState extends State<TicketWidget>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(
                                                       0.0, 20.0, 0.0, 16.0),
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.min,
@@ -473,9 +475,9 @@ class _TicketWidgetState extends State<TicketWidget>
                                                 children: [
                                                   Padding(
                                                     padding:
-                                                        EdgeInsetsDirectional
+                                                        const EdgeInsetsDirectional
                                                             .fromSTEB(20.0, 0.0,
-                                                                16.0, 4.0),
+                                                            16.0, 4.0),
                                                     child: Row(
                                                       mainAxisSize:
                                                           MainAxisSize.max,
@@ -522,9 +524,9 @@ class _TicketWidgetState extends State<TicketWidget>
                                                   ),
                                                   Padding(
                                                     padding:
-                                                        EdgeInsetsDirectional
+                                                        const EdgeInsetsDirectional
                                                             .fromSTEB(20.0, 0.0,
-                                                                20.0, 0.0),
+                                                            20.0, 0.0),
                                                     child: AutoSizeText(
                                                       functions
                                                           .replaceSubstringCaseInsensitive(
@@ -555,9 +557,9 @@ class _TicketWidgetState extends State<TicketWidget>
                                                   ),
                                                   Padding(
                                                     padding:
-                                                        EdgeInsetsDirectional
+                                                        const EdgeInsetsDirectional
                                                             .fromSTEB(20.0,
-                                                                24.0, 0.0, 0.0),
+                                                            24.0, 0.0, 0.0),
                                                     child: AutoSizeText(
                                                       functions.tolocaltime(
                                                           functions
@@ -591,9 +593,9 @@ class _TicketWidgetState extends State<TicketWidget>
                                                   ),
                                                   Padding(
                                                     padding:
-                                                        EdgeInsetsDirectional
+                                                        const EdgeInsetsDirectional
                                                             .fromSTEB(20.0, 4.0,
-                                                                20.0, 0.0),
+                                                            20.0, 0.0),
                                                     child: AutoSizeText(
                                                       functions.tolocaltime(
                                                           functions
@@ -633,12 +635,14 @@ class _TicketWidgetState extends State<TicketWidget>
                                           Container(
                                             width: 100.0,
                                             height: 100.0,
-                                            decoration: BoxDecoration(),
+                                            decoration: const BoxDecoration(),
                                             child: Align(
-                                              alignment: AlignmentDirectional(
-                                                  0.0, 0.0),
+                                              alignment:
+                                                  const AlignmentDirectional(
+                                                      0.0, 0.0),
                                               child: Padding(
-                                                padding: EdgeInsets.all(4.0),
+                                                padding:
+                                                    const EdgeInsets.all(4.0),
                                                 child: Row(
                                                   mainAxisSize:
                                                       MainAxisSize.max,
@@ -646,13 +650,10 @@ class _TicketWidgetState extends State<TicketWidget>
                                                     Expanded(
                                                       child: Padding(
                                                         padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    6.0,
-                                                                    0.0,
-                                                                    5.0,
-                                                                    0.0),
-                                                        child: Container(
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(6.0,
+                                                                0.0, 5.0, 0.0),
+                                                        child: SizedBox(
                                                           width: 200.0,
                                                           child: TextFormField(
                                                             controller: _model
@@ -707,7 +708,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                               focusedBorder:
                                                                   OutlineInputBorder(
                                                                 borderSide:
-                                                                    BorderSide(
+                                                                    const BorderSide(
                                                                   color: Color(
                                                                       0x00000000),
                                                                   width: 2.0,
@@ -781,16 +782,13 @@ class _TicketWidgetState extends State<TicketWidget>
                                                     ),
                                                     FFButtonWidget(
                                                       onPressed: () async {
-                                                        if (_model.pinTextController
-                                                                    .text !=
-                                                                null &&
-                                                            _model.pinTextController
-                                                                    .text !=
-                                                                '') {
+                                                        if (_model
+                                                                .pinTextController
+                                                                .text !=
+                                                            '') {
                                                           if (_model
-                                                                  .imagesSelected
-                                                                  .length >=
-                                                              1) {
+                                                              .imagesSelected
+                                                              .isNotEmpty) {
                                                             while (_model
                                                                     .imageSelectedIndex <
                                                                 _model
@@ -828,7 +826,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                         .primaryText,
                                                                   ),
                                                                 ),
-                                                                duration: Duration(
+                                                                duration: const Duration(
                                                                     milliseconds:
                                                                         4000),
                                                                 backgroundColor:
@@ -842,16 +840,16 @@ class _TicketWidgetState extends State<TicketWidget>
                                                           _model.responsepintoticket =
                                                               await actions
                                                                   .sendjsontourl(
-                                                            '{\"PIN\": \"${_model.pinTextController.text}\", \"id\": ${widget!.ticketID}, \"photos\": ${functions.arrayToJson(_model.imagesArray.toList())}}',
-                                                            currentJwtToken!,
+                                                            '{\"PIN\": \"${_model.pinTextController.text}\", \"id\": ${widget.ticketID}, \"photos\": ${functions.arrayToJson(_model.imagesArray.toList())}}',
+                                                            currentJwtToken,
                                                             FFAppConstants
                                                                 .setPINtoticket,
                                                           );
                                                           _model.searchResultsTicketInPIN =
                                                               await actions
                                                                   .sendjsontourl(
-                                                            ' {    \"modelName\": \"Ticket\",    \"searchCriteria\": {\"ticket_number\": ${widget!.ticketID}}}',
-                                                            currentJwtToken!,
+                                                            ' {    \"modelName\": \"Ticket\",    \"searchCriteria\": {\"ticket_number\": ${widget.ticketID}}}',
+                                                            currentJwtToken,
                                                             FFAppConstants
                                                                 .searchURL,
                                                           );
@@ -862,8 +860,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                             queryParameters: {
                                                               'ticketID':
                                                                   serializeParam(
-                                                                widget!
-                                                                    .ticketID,
+                                                                widget.ticketID,
                                                                 ParamType
                                                                     .String,
                                                               ),
@@ -886,9 +883,10 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                           .w500,
                                                                 ),
                                                               ),
-                                                              duration: Duration(
-                                                                  milliseconds:
-                                                                      4000),
+                                                              duration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          4000),
                                                               backgroundColor:
                                                                   FlutterFlowTheme.of(
                                                                           context)
@@ -900,7 +898,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                         safeSetState(() {});
                                                       },
                                                       text: 'Set',
-                                                      icon: FaIcon(
+                                                      icon: const FaIcon(
                                                         FontAwesomeIcons
                                                             .solidCheckCircle,
                                                         size: 15.0,
@@ -908,19 +906,13 @@ class _TicketWidgetState extends State<TicketWidget>
                                                       options: FFButtonOptions(
                                                         height: 55.22,
                                                         padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    16.0,
-                                                                    0.0,
-                                                                    16.0,
-                                                                    0.0),
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(16.0,
+                                                                0.0, 16.0, 0.0),
                                                         iconPadding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0),
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(0.0,
+                                                                0.0, 0.0, 0.0),
                                                         iconColor:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -965,12 +957,14 @@ class _TicketWidgetState extends State<TicketWidget>
                                           Container(
                                             width: 100.0,
                                             height: 100.0,
-                                            decoration: BoxDecoration(),
+                                            decoration: const BoxDecoration(),
                                             child: Align(
-                                              alignment: AlignmentDirectional(
-                                                  0.0, 0.0),
+                                              alignment:
+                                                  const AlignmentDirectional(
+                                                      0.0, 0.0),
                                               child: Padding(
-                                                padding: EdgeInsets.all(4.0),
+                                                padding:
+                                                    const EdgeInsets.all(4.0),
                                                 child: Row(
                                                   mainAxisSize:
                                                       MainAxisSize.max,
@@ -978,13 +972,10 @@ class _TicketWidgetState extends State<TicketWidget>
                                                     Expanded(
                                                       child: Padding(
                                                         padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    6.0,
-                                                                    0.0,
-                                                                    5.0,
-                                                                    0.0),
-                                                        child: Container(
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(6.0,
+                                                                0.0, 5.0, 0.0),
+                                                        child: SizedBox(
                                                           width: 200.0,
                                                           child: TextFormField(
                                                             controller: _model
@@ -1039,7 +1030,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                               focusedBorder:
                                                                   OutlineInputBorder(
                                                                 borderSide:
-                                                                    BorderSide(
+                                                                    const BorderSide(
                                                                   color: Color(
                                                                       0x00000000),
                                                                   width: 2.0,
@@ -1113,27 +1104,25 @@ class _TicketWidgetState extends State<TicketWidget>
                                                     ),
                                                     FFButtonWidget(
                                                       onPressed: () async {
-                                                        if (_model.pINProcessingToCompletedTextController
-                                                                    .text !=
-                                                                null &&
-                                                            _model.pINProcessingToCompletedTextController
-                                                                    .text !=
-                                                                '') {
+                                                        if (_model
+                                                                .pINProcessingToCompletedTextController
+                                                                .text !=
+                                                            '') {
                                                           if (loggedIn ==
                                                               true) {
                                                             _model.responsepintoticketCompleted =
                                                                 await actions
                                                                     .sendjsontourl(
-                                                              '{\"PIN\": \"${_model.pINProcessingToCompletedTextController.text}\", \"id\": ${widget!.ticketID}}',
-                                                              currentJwtToken!,
+                                                              '{\"PIN\": \"${_model.pINProcessingToCompletedTextController.text}\", \"id\": ${widget.ticketID}}',
+                                                              currentJwtToken,
                                                               FFAppConstants
                                                                   .setPINtoCompleted,
                                                             );
                                                             _model.searchResultsTicketInPINCompleted =
                                                                 await actions
                                                                     .sendjsontourl(
-                                                              ' {    \"modelName\": \"Ticket\",    \"searchCriteria\": {\"ticket_number\": ${widget!.ticketID}}}',
-                                                              currentJwtToken!,
+                                                              ' {    \"modelName\": \"Ticket\",    \"searchCriteria\": {\"ticket_number\": ${widget.ticketID}}}',
+                                                              currentJwtToken,
                                                               FFAppConstants
                                                                   .searchURL,
                                                             );
@@ -1149,14 +1138,14 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                 builder:
                                                                     (alertDialogContext) {
                                                                   return AlertDialog(
-                                                                    title: Text(
+                                                                    title: const Text(
                                                                         'Completed'),
                                                                     actions: [
                                                                       TextButton(
                                                                         onPressed:
                                                                             () =>
                                                                                 Navigator.pop(alertDialogContext),
-                                                                        child: Text(
+                                                                        child: const Text(
                                                                             'Ok'),
                                                                       ),
                                                                     ],
@@ -1198,7 +1187,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                         .primaryBackground,
                                                                   ),
                                                                 ),
-                                                                duration: Duration(
+                                                                duration: const Duration(
                                                                     milliseconds:
                                                                         4000),
                                                                 backgroundColor:
@@ -1225,9 +1214,10 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                           .w500,
                                                                 ),
                                                               ),
-                                                              duration: Duration(
-                                                                  milliseconds:
-                                                                      4000),
+                                                              duration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          4000),
                                                               backgroundColor:
                                                                   FlutterFlowTheme.of(
                                                                           context)
@@ -1242,19 +1232,13 @@ class _TicketWidgetState extends State<TicketWidget>
                                                       options: FFButtonOptions(
                                                         height: 55.2,
                                                         padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    16.0,
-                                                                    0.0,
-                                                                    16.0,
-                                                                    0.0),
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(16.0,
+                                                                0.0, 16.0, 0.0),
                                                         iconPadding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0),
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(0.0,
+                                                                0.0, 0.0, 0.0),
                                                         color:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -1290,15 +1274,15 @@ class _TicketWidgetState extends State<TicketWidget>
                                         if (_model.accepted &&
                                             !_model.isTicketParked)
                                           Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    0.0, 0.0, 0.0, 5.0),
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(0.0, 0.0, 0.0, 5.0),
                                             child: Container(
                                               width: 100.0,
-                                              decoration: BoxDecoration(),
+                                              decoration: const BoxDecoration(),
                                               child: Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(
                                                         6.0, 0.0, 6.0, 0.0),
                                                 child: Column(
                                                   mainAxisSize:
@@ -1306,13 +1290,13 @@ class _TicketWidgetState extends State<TicketWidget>
                                                   children: [
                                                     Stack(
                                                       alignment:
-                                                          AlignmentDirectional(
+                                                          const AlignmentDirectional(
                                                               1.0, 0.0),
                                                       children: [
                                                         Padding(
                                                           padding:
-                                                              EdgeInsets.all(
-                                                                  4.0),
+                                                              const EdgeInsets
+                                                                  .all(4.0),
                                                           child: FFButtonWidget(
                                                             onPressed:
                                                                 () async {
@@ -1348,7 +1332,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                       child:
                                                                           BottomSheetEditDataSpaceWidget(
                                                                         ticketNumber:
-                                                                            widget!.ticketID!,
+                                                                            widget.ticketID!,
                                                                         actionCallback:
                                                                             () async {
                                                                           _model.isTicketParked =
@@ -1374,19 +1358,19 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                   1.0,
                                                               height: 58.4,
                                                               padding:
-                                                                  EdgeInsetsDirectional
+                                                                  const EdgeInsetsDirectional
                                                                       .fromSTEB(
-                                                                          16.0,
-                                                                          0.0,
-                                                                          16.0,
-                                                                          0.0),
+                                                                      16.0,
+                                                                      0.0,
+                                                                      16.0,
+                                                                      0.0),
                                                               iconPadding:
-                                                                  EdgeInsetsDirectional
+                                                                  const EdgeInsetsDirectional
                                                                       .fromSTEB(
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0),
+                                                                      0.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                      0.0),
                                                               color: FlutterFlowTheme
                                                                       .of(context)
                                                                   .primary,
@@ -1414,16 +1398,16 @@ class _TicketWidgetState extends State<TicketWidget>
                                                         ),
                                                         Align(
                                                           alignment:
-                                                              AlignmentDirectional(
+                                                              const AlignmentDirectional(
                                                                   1.0, 0.0),
                                                           child: Padding(
                                                             padding:
-                                                                EdgeInsetsDirectional
+                                                                const EdgeInsetsDirectional
                                                                     .fromSTEB(
-                                                                        0.0,
-                                                                        0.0,
-                                                                        20.0,
-                                                                        0.0),
+                                                                    0.0,
+                                                                    0.0,
+                                                                    20.0,
+                                                                    0.0),
                                                             child: Icon(
                                                               Icons
                                                                   .check_circle,
@@ -1456,13 +1440,13 @@ class _TicketWidgetState extends State<TicketWidget>
                                               children: [
                                                 Align(
                                                   alignment:
-                                                      AlignmentDirectional(
+                                                      const AlignmentDirectional(
                                                           -0.85, -0.15),
                                                   child: Material(
                                                     color: Colors.transparent,
                                                     elevation: 0.0,
                                                     shape:
-                                                        RoundedRectangleBorder(
+                                                        const RoundedRectangleBorder(
                                                       borderRadius:
                                                           BorderRadius.only(
                                                         bottomLeft:
@@ -1488,7 +1472,8 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                     context)
                                                                 .alternate,
                                                         borderRadius:
-                                                            BorderRadius.only(
+                                                            const BorderRadius
+                                                                .only(
                                                           bottomLeft:
                                                               Radius.circular(
                                                                   0.0),
@@ -1583,13 +1568,13 @@ class _TicketWidgetState extends State<TicketWidget>
                                                 ),
                                                 Align(
                                                   alignment:
-                                                      AlignmentDirectional(
+                                                      const AlignmentDirectional(
                                                           0.85, -0.15),
                                                   child: Material(
                                                     color: Colors.transparent,
                                                     elevation: 0.0,
                                                     shape:
-                                                        RoundedRectangleBorder(
+                                                        const RoundedRectangleBorder(
                                                       borderRadius:
                                                           BorderRadius.only(
                                                         bottomLeft:
@@ -1615,7 +1600,8 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                     context)
                                                                 .alternate,
                                                         borderRadius:
-                                                            BorderRadius.only(
+                                                            const BorderRadius
+                                                                .only(
                                                           bottomLeft:
                                                               Radius.circular(
                                                                   50.0),
@@ -1638,8 +1624,9 @@ class _TicketWidgetState extends State<TicketWidget>
                                               ],
                                             ),
                                             Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(
                                                       20.0, 12.0, 20.0, 0.0),
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.max,
@@ -1685,20 +1672,21 @@ class _TicketWidgetState extends State<TicketWidget>
                                                         children: [
                                                           Padding(
                                                             padding:
-                                                                EdgeInsetsDirectional
+                                                                const EdgeInsetsDirectional
                                                                     .fromSTEB(
-                                                                        0.0,
-                                                                        12.0,
-                                                                        0.0,
-                                                                        0.0),
+                                                                    0.0,
+                                                                    12.0,
+                                                                    0.0,
+                                                                    0.0),
                                                             child: Row(
                                                               mainAxisSize:
                                                                   MainAxisSize
                                                                       .max,
                                                               children: [
                                                                 Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
+                                                                  padding:
+                                                                      const EdgeInsetsDirectional
+                                                                          .fromSTEB(
                                                                           0.0,
                                                                           0.0,
                                                                           12.0,
@@ -1752,20 +1740,21 @@ class _TicketWidgetState extends State<TicketWidget>
                                                           ),
                                                           Padding(
                                                             padding:
-                                                                EdgeInsetsDirectional
+                                                                const EdgeInsetsDirectional
                                                                     .fromSTEB(
-                                                                        0.0,
-                                                                        12.0,
-                                                                        0.0,
-                                                                        0.0),
+                                                                    0.0,
+                                                                    12.0,
+                                                                    0.0,
+                                                                    0.0),
                                                             child: Row(
                                                               mainAxisSize:
                                                                   MainAxisSize
                                                                       .max,
                                                               children: [
                                                                 Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
+                                                                  padding:
+                                                                      const EdgeInsetsDirectional
+                                                                          .fromSTEB(
                                                                           0.0,
                                                                           0.0,
                                                                           12.0,
@@ -1823,12 +1812,12 @@ class _TicketWidgetState extends State<TicketWidget>
                                                           _model.isTicketParked)
                                                         Padding(
                                                           padding:
-                                                              EdgeInsetsDirectional
+                                                              const EdgeInsetsDirectional
                                                                   .fromSTEB(
-                                                                      0.0,
-                                                                      0.0,
-                                                                      5.0,
-                                                                      0.0),
+                                                                  0.0,
+                                                                  0.0,
+                                                                  5.0,
+                                                                  0.0),
                                                           child:
                                                               FlutterFlowIconButton(
                                                             borderRadius: 12.0,
@@ -1876,7 +1865,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                       child:
                                                                           BottomSheetEditDataSpaceWidget(
                                                                         ticketNumber:
-                                                                            widget!.ticketID!,
+                                                                            widget.ticketID!,
                                                                         actionCallback:
                                                                             () async {},
                                                                       ),
@@ -1891,68 +1880,32 @@ class _TicketWidgetState extends State<TicketWidget>
                                                         ),
                                                     ],
                                                   ),
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(0.0, 12.0,
-                                                                0.0, 0.0),
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                                      0.0,
-                                                                      0.0,
-                                                                      12.0,
-                                                                      0.0),
-                                                          child: Text(
-                                                            'Puchased',
-                                                            style: FlutterFlowTheme
-                                                                    .of(context)
-                                                                .titleLarge
-                                                                .override(
-                                                                  fontFamily: FlutterFlowTheme.of(
+                                                  if (functions.getkeyfromjsonstring(_model.searchResultsTicket!, 'value') != null &&
+                                                      functions.getkeyfromjsonstring(_model.searchResultsTicket!, 'value')!.isNotEmpty &&
+                                                      functions.getkeyfromjsonstring(_model.searchResultsTicket!, 'value') != '0')
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsetsDirectional
+                                                              .fromSTEB(0.0, 12.0,
+                                                              0.0, 0.0),
+                                                      child: Text(
+                                                        '\$${functions.tostr(functions.getkeyfromjsonstring(_model.searchResultsTicket!, 'value'))}',
+                                                        style: FlutterFlowTheme
+                                                                .of(context)
+                                                            .titleLarge
+                                                            .override(
+                                                              fontFamily: FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .titleLargeFamily,
+                                                              letterSpacing:
+                                                                  0.0,
+                                                              useGoogleFonts:
+                                                                  !FlutterFlowTheme.of(
                                                                           context)
-                                                                      .titleLargeFamily,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  useGoogleFonts:
-                                                                      !FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .titleLargeIsCustom,
-                                                                ),
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          valueOrDefault<
-                                                              String>(
-                                                            '\$${functions.tostr(functions.getkeyfromjsonstring(_model.searchResultsTicket!, 'value'))}',
-                                                            '\$24,57',
-                                                          ),
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .titleLarge
-                                                              .override(
-                                                                fontFamily: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .titleLargeFamily,
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                useGoogleFonts:
-                                                                    !FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .titleLargeIsCustom,
-                                                              ),
-                                                        ),
-                                                      ],
+                                                                      .titleLargeIsCustom,
+                                                            ),
+                                                      ),
                                                     ),
-                                                  ),
                                                   if (!_model.accepted)
                                                     Column(
                                                       mainAxisSize:
@@ -1960,12 +1913,12 @@ class _TicketWidgetState extends State<TicketWidget>
                                                       children: [
                                                         Padding(
                                                           padding:
-                                                              EdgeInsetsDirectional
+                                                              const EdgeInsetsDirectional
                                                                   .fromSTEB(
-                                                                      0.0,
-                                                                      15.0,
-                                                                      0.0,
-                                                                      0.0),
+                                                                  0.0,
+                                                                  15.0,
+                                                                  0.0,
+                                                                  0.0),
                                                           child: InkWell(
                                                             splashColor: Colors
                                                                 .transparent,
@@ -2036,13 +1989,11 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                 }
                                                               }
 
-                                                              if (_model.uploadedLocalFile_uploadDataAlw !=
-                                                                      null &&
-                                                                  (_model
-                                                                          .uploadedLocalFile_uploadDataAlw
-                                                                          .bytes
-                                                                          ?.isNotEmpty ??
-                                                                      false)) {
+                                                              if ((_model
+                                                                      .uploadedLocalFile_uploadDataAlw
+                                                                      .bytes
+                                                                      ?.isNotEmpty ??
+                                                                  false)) {
                                                                 _model.addToImagesSelected(
                                                                     _model
                                                                         .uploadedLocalFile_uploadDataAlw);
@@ -2086,7 +2037,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                     MainAxisAlignment
                                                                         .center,
                                                                 children: [
-                                                                  Padding(
+                                                                  const Padding(
                                                                     padding: EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                             0.0,
@@ -2132,7 +2083,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                 1.0,
                                                             height: 295.0,
                                                             decoration:
-                                                                BoxDecoration(),
+                                                                const BoxDecoration(),
                                                             child: Builder(
                                                               builder:
                                                                   (context) {
@@ -2161,7 +2112,8 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                         photoList[
                                                                             photoListIndex];
                                                                     return Padding(
-                                                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                                                      padding: const EdgeInsetsDirectional
+                                                                          .fromSTEB(
                                                                           0.0,
                                                                           20.0,
                                                                           0.0,
@@ -2174,7 +2126,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                             CrossAxisAlignment.start,
                                                                         children: [
                                                                           Padding(
-                                                                            padding: EdgeInsetsDirectional.fromSTEB(
+                                                                            padding: const EdgeInsetsDirectional.fromSTEB(
                                                                                 10.0,
                                                                                 0.0,
                                                                                 12.0,
@@ -2196,7 +2148,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                             ),
                                                                           ),
                                                                           Padding(
-                                                                            padding: EdgeInsetsDirectional.fromSTEB(
+                                                                            padding: const EdgeInsetsDirectional.fromSTEB(
                                                                                 5.0,
                                                                                 15.0,
                                                                                 0.0,
@@ -2232,7 +2184,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                 1.0,
                                                             height: 295.0,
                                                             decoration:
-                                                                BoxDecoration(),
+                                                                const BoxDecoration(),
                                                             child: Builder(
                                                               builder:
                                                                   (context) {
@@ -2261,7 +2213,8 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                         photoListArrival[
                                                                             photoListArrivalIndex];
                                                                     return Padding(
-                                                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                                                      padding: const EdgeInsetsDirectional
+                                                                          .fromSTEB(
                                                                           0.0,
                                                                           20.0,
                                                                           0.0,
@@ -2274,7 +2227,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                             CrossAxisAlignment.start,
                                                                         children: [
                                                                           Padding(
-                                                                            padding: EdgeInsetsDirectional.fromSTEB(
+                                                                            padding: const EdgeInsetsDirectional.fromSTEB(
                                                                                 10.0,
                                                                                 0.0,
                                                                                 12.0,
@@ -2296,7 +2249,7 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                             ),
                                                                           ),
                                                                           Padding(
-                                                                            padding: EdgeInsetsDirectional.fromSTEB(
+                                                                            padding: const EdgeInsetsDirectional.fromSTEB(
                                                                                 5.0,
                                                                                 15.0,
                                                                                 0.0,
@@ -2327,8 +2280,9 @@ class _TicketWidgetState extends State<TicketWidget>
                                                   'columnOnPageLoadAnimation2']!),
                                             ),
                                             Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(
                                                       0.0, 24.0, 0.0, 12.0),
                                               child: Container(
                                                 width:
@@ -2336,12 +2290,13 @@ class _TicketWidgetState extends State<TicketWidget>
                                                             .width *
                                                         1.0,
                                                 height: 90.0,
-                                                decoration: BoxDecoration(
+                                                decoration: const BoxDecoration(
                                                   color: Color(0x00FFFFFF),
                                                 ),
                                                 child: Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
+                                                  padding:
+                                                      const EdgeInsetsDirectional
+                                                          .fromSTEB(
                                                           16.0, 0.0, 16.0, 0.0),
                                                   child: BarcodeWidget(
                                                     data: _model.ticketnumber,
@@ -2354,8 +2309,8 @@ class _TicketWidgetState extends State<TicketWidget>
                                                     backgroundColor:
                                                         Colors.transparent,
                                                     errorBuilder:
-                                                        (_context, _error) =>
-                                                            SizedBox(
+                                                        (context, error) =>
+                                                            const SizedBox(
                                                       width: 100.0,
                                                       height: 50.0,
                                                     ),
@@ -2382,13 +2337,13 @@ class _TicketWidgetState extends State<TicketWidget>
                           decoration: BoxDecoration(
                             color: FlutterFlowTheme.of(context).alternate,
                           ),
-                          alignment: AlignmentDirectional(0.0, 0.0),
+                          alignment: const AlignmentDirectional(0.0, 0.0),
                           child: Lottie.asset(
                             'assets/jsons/loading2.json',
                             width: 208.3,
                             height: 230.69,
                             fit: BoxFit.contain,
-                            frameRate: FrameRate(60.0),
+                            frameRate: const FrameRate(60.0),
                             animate: true,
                           ),
                         ),

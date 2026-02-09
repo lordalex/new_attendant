@@ -8,11 +8,11 @@ class TicketDetailPage extends StatefulWidget {
   final String idToken;
 
   const TicketDetailPage({
-    Key? key,
+    super.key,
     required this.ticketJson,
     required this.apiUrl,
     required this.idToken,
-  }) : super(key: key);
+  });
 
   @override
   State<TicketDetailPage> createState() => _TicketDetailPageState();

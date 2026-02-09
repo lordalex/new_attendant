@@ -63,16 +63,16 @@ class _BottomSheetEditDataSpaceWidgetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
       child: Padding(
-        padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+        padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
             color: FlutterFlowTheme.of(context).secondaryBackground,
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
                 blurRadius: 10.0,
                 color: Color(0x33000000),
@@ -83,7 +83,7 @@ class _BottomSheetEditDataSpaceWidgetState
                 spreadRadius: 0.0,
               )
             ],
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(0.0),
               bottomRight: Radius.circular(0.0),
               topLeft: Radius.circular(16.0),
@@ -91,7 +91,8 @@ class _BottomSheetEditDataSpaceWidgetState
             ),
           ),
           child: Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+            padding:
+                const EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +126,7 @@ class _BottomSheetEditDataSpaceWidgetState
                         Navigator.pop(context);
                       },
                     ),
-                  ].divide(SizedBox(width: 8.0)),
+                  ].divide(const SizedBox(width: 8.0)),
                 ),
                 Container(
                   width: double.infinity,
@@ -187,21 +188,21 @@ class _BottomSheetEditDataSpaceWidgetState
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Color(0x91131919),
                             width: 2.0,
                           ),
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Color(0x00000000),
                             width: 2.0,
                           ),
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Color(0x00000000),
                             width: 2.0,
                           ),
@@ -244,7 +245,7 @@ class _BottomSheetEditDataSpaceWidgetState
                           }),
                       ],
                     ),
-                  ].divide(SizedBox(height: 12.0)),
+                  ].divide(const SizedBox(height: 12.0)),
                 ),
                 Column(
                   mainAxisSize: MainAxisSize.min,
@@ -298,21 +299,21 @@ class _BottomSheetEditDataSpaceWidgetState
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Color(0x91131919),
                             width: 2.0,
                           ),
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Color(0x00000000),
                             width: 2.0,
                           ),
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Color(0x00000000),
                             width: 2.0,
                           ),
@@ -355,21 +356,19 @@ class _BottomSheetEditDataSpaceWidgetState
                           }),
                       ],
                     ),
-                  ].divide(SizedBox(height: 12.0)),
+                  ].divide(const SizedBox(height: 12.0)),
                 ),
                 FFButtonWidget(
                   onPressed: () async {
-                    if ((_model.textController1.text != null &&
-                            _model.textController1.text != '') &&
-                        (_model.textController2.text != null &&
-                            _model.textController2.text != '')) {
+                    if ((_model.textController1.text != '') &&
+                        (_model.textController2.text != '')) {
                       _model.setTicketToParked = await actions.sendjsontourl(
-                        '{\"id\": ${widget!.ticketNumber},\"parkingSpace\": \"${_model.textController1.text}\",\"lockerSpace\": \"${_model.textController2.text}\"}',
-                        currentJwtToken!,
+                        '{\"id\": ${widget.ticketNumber},\"parkingSpace\": \"${_model.textController1.text}\",\"lockerSpace\": \"${_model.textController2.text}\"}',
+                        currentJwtToken,
                         FFAppConstants.setTicketToParked,
                       );
                       await Future.delayed(
-                        Duration(
+                        const Duration(
                           milliseconds: 3500,
                         ),
                       );
@@ -383,7 +382,7 @@ class _BottomSheetEditDataSpaceWidgetState
                               color: FlutterFlowTheme.of(context).primaryText,
                             ),
                           ),
-                          duration: Duration(milliseconds: 4000),
+                          duration: const Duration(milliseconds: 4000),
                           backgroundColor:
                               FlutterFlowTheme.of(context).secondary,
                         ),
@@ -400,9 +399,9 @@ class _BottomSheetEditDataSpaceWidgetState
                   options: FFButtonOptions(
                     width: double.infinity,
                     height: 50.0,
-                    padding: EdgeInsets.all(8.0),
-                    iconPadding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    padding: const EdgeInsets.all(8.0),
+                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 0.0, 0.0, 0.0),
                     color: FlutterFlowTheme.of(context).primary,
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                           fontFamily:
@@ -413,14 +412,14 @@ class _BottomSheetEditDataSpaceWidgetState
                               !FlutterFlowTheme.of(context).titleSmallIsCustom,
                         ),
                     elevation: 0.0,
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       color: Colors.transparent,
                       width: 1.0,
                     ),
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
-              ].divide(SizedBox(height: 16.0)),
+              ].divide(const SizedBox(height: 16.0)),
             ),
           ),
         ),

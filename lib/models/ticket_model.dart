@@ -15,6 +15,8 @@ class Ticket {
   final DateTime updatedAt;
   final Map<String, dynamic>? vehicleData;
   final String? clientPhotoUrl;
+  final String? clientFirstName;
+  final String? clientLastName;
 
   Ticket({
     required this.id,
@@ -31,15 +33,58 @@ class Ticket {
     required this.updatedAt,
     this.vehicleData,
     this.clientPhotoUrl,
+    this.clientFirstName,
+    this.clientLastName,
   });
+
+  String get clientFullName {
+    final first = clientFirstName ?? '';
+    final last = clientLastName ?? '';
+    final name = '$first $last'.trim();
+    return name.isNotEmpty ? name : 'Unknown';
+  }
 
   factory Ticket.fromJson(String jsonString) {
     final Map<String, dynamic> json = jsonDecode(jsonString);
 
+    // Parse user_client — can be a nested object or a plain string ID
+    String userClientStr = '';
+    String? clientPhoto;
+    String? clientFirstName;
+    String? clientLastName;
+
+    final userClientRaw = json['user_client'];
+    if (userClientRaw is Map<String, dynamic>) {
+      userClientStr = userClientRaw['id']?.toString() ?? '';
+      clientPhoto = userClientRaw['photo']?.toString();
+      clientFirstName = userClientRaw['firstname']?.toString();
+      clientLastName = userClientRaw['lastname']?.toString();
+    } else if (userClientRaw is String) {
+      // Try to decode if it's a JSON string
+      try {
+        final parsed = jsonDecode(userClientRaw);
+        if (parsed is Map<String, dynamic>) {
+          userClientStr = parsed['id']?.toString() ?? '';
+          clientPhoto = parsed['photo']?.toString();
+          clientFirstName = parsed['firstname']?.toString();
+          clientLastName = parsed['lastname']?.toString();
+        } else {
+          userClientStr = userClientRaw;
+        }
+      } catch (_) {
+        userClientStr = userClientRaw;
+      }
+    }
+
+    // Photo fallback: user_client.photo > top-level fields
+    clientPhoto ??= json['clientPhoto']?.toString() ??
+        json['photo']?.toString() ??
+        json['client_photo']?.toString();
+
     return Ticket(
       id: json['id'] ?? '',
       ticketNumber: json['ticket_number'] ?? '',
-      userClient: json['user_client'] ?? '',
+      userClient: userClientStr,
       vehicle: json['vehicle'] ?? '',
       status: json['status'] ?? '',
       location: json['location'] ?? '',
@@ -50,8 +95,9 @@ class Ticket {
       createdAt: _parseTimestamp(json['createdAt']),
       updatedAt: _parseTimestamp(json['updatedAt']),
       vehicleData: json['vehicleData'],
-      clientPhotoUrl:
-          json['clientPhoto'] ?? json['photo'] ?? json['client_photo'],
+      clientPhotoUrl: clientPhoto,
+      clientFirstName: clientFirstName,
+      clientLastName: clientLastName,
     );
   }
 
@@ -141,6 +187,8 @@ class Ticket {
       updatedAt: updatedAt,
       vehicleData: vehicleData ?? this.vehicleData,
       clientPhotoUrl: clientPhotoUrl,
+      clientFirstName: clientFirstName,
+      clientLastName: clientLastName,
     );
   }
 }

@@ -38,9 +38,9 @@ class SlidableTileTicketListProcessingWidget extends StatefulWidget {
     this.ticketJson,
     this.apiUrl,
     this.idToken,
-  })  : this.timeTextColor = timeTextColor ?? const Color(0xFF57636C),
-        this.timerTimeIntegerMs = timerTimeIntegerMs ?? 0,
-        this.vehicleInfo = vehicleInfo ?? ' ';
+  })  : timeTextColor = timeTextColor ?? const Color(0xFF57636C),
+        timerTimeIntegerMs = timerTimeIntegerMs ?? 0,
+        vehicleInfo = vehicleInfo ?? ' ';
 
   final String? name;
   final String? plate;
@@ -84,10 +84,10 @@ class _SlidableTileTicketListProcessingWidgetState
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       // NEW: Parse ticket JSON and fetch vehicle data
-      if (widget!.ticketJson != null && widget!.ticketJson!.isNotEmpty) {
+      if (widget.ticketJson != null && widget.ticketJson!.isNotEmpty) {
         try {
           print("[SlidableTile] Parsing ticket JSON");
-          _model.ticket = Ticket.fromJson(widget!.ticketJson!);
+          _model.ticket = Ticket.fromJson(widget.ticketJson!);
 
           // Calculate time difference
           _model.timeDifferenceText = _model.ticket!.timeDifference;
@@ -103,13 +103,13 @@ class _SlidableTileTicketListProcessingWidgetState
           }
 
           // Fetch vehicle data if available
-          if (widget!.apiUrl != null &&
-              widget!.idToken != null &&
+          if (widget.apiUrl != null &&
+              widget.idToken != null &&
               _model.ticket!.vehicle.isNotEmpty) {
             print("[SlidableTile] Fetching vehicle data");
             final vehicleService = VehicleService(
-              apiUrl: widget!.apiUrl!,
-              idToken: widget!.idToken!,
+              apiUrl: widget.apiUrl!,
+              idToken: widget.idToken!,
             );
 
             final vehicleData = await vehicleService
@@ -119,13 +119,13 @@ class _SlidableTileTicketListProcessingWidgetState
               _model.ticket = _model.ticket!.copyWith(vehicleData: vehicleData);
               _model.vehicleDisplayText = _model.ticket!.formattedVehicle;
             } else {
-              _model.vehicleDisplayText = widget!.vehicleInfo != ' '
-                  ? widget!.vehicleInfo
+              _model.vehicleDisplayText = widget.vehicleInfo != ' '
+                  ? widget.vehicleInfo
                   : "Vehicle info unavailable";
             }
           } else {
-            _model.vehicleDisplayText = widget!.vehicleInfo != ' '
-                ? widget!.vehicleInfo
+            _model.vehicleDisplayText = widget.vehicleInfo != ' '
+                ? widget.vehicleInfo
                 : "Vehicle info unavailable";
           }
 
@@ -134,19 +134,19 @@ class _SlidableTileTicketListProcessingWidgetState
         } catch (e) {
           print("[SlidableTile] Error: $e");
           _model.isLoadingVehicle = false;
-          _model.vehicleDisplayText = widget!.vehicleInfo != ' '
-              ? widget!.vehicleInfo
+          _model.vehicleDisplayText = widget.vehicleInfo != ' '
+              ? widget.vehicleInfo
               : "Vehicle info unavailable";
         }
       } else {
         // Legacy mode - use existing logic
         _model.isLoadingVehicle = false;
-        _model.vehicleDisplayText = widget!.vehicleInfo != ' '
-            ? widget!.vehicleInfo
+        _model.vehicleDisplayText = widget.vehicleInfo != ' '
+            ? widget.vehicleInfo
             : "Vehicle info unavailable";
       }
       _model.timerController.timer.setPresetTime(
-        mSec: widget!.timerTimeIntegerMs,
+        mSec: widget.timerTimeIntegerMs,
         add: false,
       );
       _model.timerController.onResetTimer();
@@ -154,24 +154,16 @@ class _SlidableTileTicketListProcessingWidgetState
       _model.timerController.onStartTimer();
       _model.posx = 0.0;
       _model.updatePage(() {});
-      if (widget!.profileImg != null && widget!.profileImg != '') {
-        _model.clientPhoto = await actions.base64toBytesAction(
-          widget!.profileImg!,
-          'clientPhoto',
-        );
+      // Only load from profileImg if ticket JSON didn't already load a photo
+      if (_model.clientPhoto == null || (_model.clientPhoto?.bytes?.isEmpty ?? true)) {
+        if (widget.profileImg != null && widget.profileImg != '' && widget.profileImg != 'error') {
+          _model.clientPhoto = await actions.base64toBytesAction(
+            widget.profileImg!,
+            'clientPhoto',
+          );
+        }
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            widget!.date!,
-            style: TextStyle(
-              color: FlutterFlowTheme.of(context).primaryText,
-            ),
-          ),
-          duration: Duration(milliseconds: 4000),
-          backgroundColor: FlutterFlowTheme.of(context).secondary,
-        ),
-      );
+      safeSetState(() {});
     });
 
     animationsMap.addAll({
@@ -183,8 +175,8 @@ class _SlidableTileTicketListProcessingWidgetState
             curve: Curves.elasticOut,
             delay: 0.0.ms,
             duration: 900.0.ms,
-            begin: Offset(0.0, 0.0),
-            end: Offset(-100.0, 0.0),
+            begin: const Offset(0.0, 0.0),
+            end: const Offset(-100.0, 0.0),
           ),
           FadeEffect(
             curve: Curves.easeInOut,
@@ -225,13 +217,13 @@ class _SlidableTileTicketListProcessingWidgetState
                 .forward();
           }
           await Future.delayed(
-            Duration(
+            const Duration(
               milliseconds: 150,
             ),
           );
           await widget.callback?.call();
           FFAppState().isTicketOn = true;
-          FFAppState().ticketNumber = widget!.ticketNumber!;
+          FFAppState().ticketNumber = widget.ticketNumber!;
           safeSetState(() {});
         }
         _model.posx = details.localPosition.dx;
@@ -250,11 +242,11 @@ class _SlidableTileTicketListProcessingWidgetState
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding:
-                      EdgeInsetsDirectional.fromSTEB(15.0, 10.0, 15.0, 15.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(
+                      15.0, 10.0, 15.0, 15.0),
                   child: Container(
-                    width: 73.6,
-                    height: 77.6,
+                    width: 70.0,
+                    height: 70.0,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).secondaryBackground,
                       borderRadius: BorderRadius.circular(15.0),
@@ -265,21 +257,21 @@ class _SlidableTileTicketListProcessingWidgetState
                               _model.clientPhoto!.bytes!.isNotEmpty)
                           ? Image.memory(
                               _model.clientPhoto!.bytes!,
-                              width: 194.4,
-                              height: 207.9,
+                              width: 70.0,
+                              height: 70.0,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
                                   Image.asset(
                                 'assets/images/error_image.png',
-                                width: 194.4,
-                                height: 207.9,
+                                width: 70.0,
+                                height: 70.0,
                                 fit: BoxFit.cover,
                               ),
                             )
                           : Image.asset(
                               'assets/images/image-default.jpg',
-                              width: 194.4,
-                              height: 207.9,
+                              width: 70.0,
+                              height: 70.0,
                               fit: BoxFit.cover,
                             ),
                     ),
@@ -287,22 +279,21 @@ class _SlidableTileTicketListProcessingWidgetState
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 7.0, 5.0, 7.0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 7.0, 5.0, 7.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Align(
-                          alignment: AlignmentDirectional(-1.0, 0.0),
-                          child: Container(
-                            width: MediaQuery.sizeOf(context).width * 0.464,
-                            decoration: BoxDecoration(),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
+                          alignment: const AlignmentDirectional(-1.0, 0.0),
+                          child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   valueOrDefault<String>(
-                                    widget!.date,
+                                    widget.date,
                                     'No Date',
                                   ),
                                   textAlign: TextAlign.start,
@@ -330,12 +321,14 @@ class _SlidableTileTicketListProcessingWidgetState
                                       ),
                                 ),
                                 Align(
-                                  alignment: AlignmentDirectional(0.0, 0.0),
+                                  alignment:
+                                      const AlignmentDirectional(0.0, 0.0),
                                   child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 18.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 18.0, 0.0, 0.0),
                                     child: Text(
-                                      '${widget!.name}',
+                                      '${widget.name}',
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -362,10 +355,11 @@ class _SlidableTileTicketListProcessingWidgetState
                                 // Display time difference
                                 if (_model.timeDifferenceText != null)
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 4.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 4.0, 0.0, 0.0),
                                     child: Container(
-                                      padding: EdgeInsets.symmetric(
+                                      padding: const EdgeInsets.symmetric(
                                           horizontal: 8.0, vertical: 2.0),
                                       decoration: BoxDecoration(
                                         color: Colors.blue[50],
@@ -385,14 +379,15 @@ class _SlidableTileTicketListProcessingWidgetState
                                 // Display vehicle info
                                 if (_model.vehicleDisplayText != null)
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 4.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 4.0, 0.0, 0.0),
                                     child: Row(
                                       children: [
                                         Icon(Icons.directions_car,
                                             size: 14.0,
                                             color: Colors.grey[600]),
-                                        SizedBox(width: 4.0),
+                                        const SizedBox(width: 4.0),
                                         Expanded(
                                           child: Text(
                                             _model.isLoadingVehicle
@@ -415,21 +410,21 @@ class _SlidableTileTicketListProcessingWidgetState
                                   ),
                               ],
                             ),
-                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                Expanded(
+                SizedBox(
+                  width: 130.0,
                   child: Align(
-                    alignment: AlignmentDirectional(1.0, 0.0),
+                    alignment: const AlignmentDirectional(1.0, 0.0),
                     child: Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 5.0, 0.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 0.0, 5.0, 0.0),
                       child: Container(
                         width: 120.0,
-                        decoration: BoxDecoration(),
+                        decoration: const BoxDecoration(),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -437,8 +432,8 @@ class _SlidableTileTicketListProcessingWidgetState
                             FaIcon(
                               FontAwesomeIcons.solidClock,
                               color: valueOrDefault<Color>(
-                                widget!.timerTimeIntegerMs >= 300000
-                                    ? Color(0xFFA50707)
+                                widget.timerTimeIntegerMs >= 300000
+                                    ? const Color(0xFFA50707)
                                     : FlutterFlowTheme.of(context).primaryText,
                                 FlutterFlowTheme.of(context).primary,
                               ),
@@ -449,7 +444,7 @@ class _SlidableTileTicketListProcessingWidgetState
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       5.0, 0.0, 0.0, 0.0),
                                   child: FlutterFlowTimer(
                                     initialTime: _model.timerInitialTimeMs,
@@ -461,7 +456,7 @@ class _SlidableTileTicketListProcessingWidgetState
                                     ),
                                     controller: _model.timerController,
                                     updateStateInterval:
-                                        Duration(milliseconds: 1000),
+                                        const Duration(milliseconds: 1000),
                                     onChanged:
                                         (value, displayTime, shouldUpdate) {
                                       _model.timerMilliseconds = value;
@@ -475,12 +470,12 @@ class _SlidableTileTicketListProcessingWidgetState
                                           fontFamily:
                                               FlutterFlowTheme.of(context)
                                                   .headlineSmallFamily,
-                                          color: widget!.timerTimeIntegerMs >=
+                                          color: widget.timerTimeIntegerMs >=
                                                   300000
-                                              ? Color(0xFFA50707)
+                                              ? const Color(0xFFA50707)
                                               : FlutterFlowTheme.of(context)
                                                   .primaryText,
-                                          fontSize: 25.0,
+                                          fontSize: 22.0,
                                           letterSpacing: 0.0,
                                           useGoogleFonts:
                                               !FlutterFlowTheme.of(context)
@@ -496,11 +491,11 @@ class _SlidableTileTicketListProcessingWidgetState
                     ),
                   ),
                 ),
-                if ((widget!.name == null || widget!.name == '') ||
-                    (widget!.pin == null || widget!.pin == '') ||
-                    (widget!.name == ' '))
+                if ((widget.name == null || widget.name == '') ||
+                    (widget.pin == null || widget.pin == '') ||
+                    (widget.name == ' '))
                   Align(
-                    alignment: AlignmentDirectional(0.0, 0.0),
+                    alignment: const AlignmentDirectional(0.0, 0.0),
                     child: InkWell(
                       splashColor: Colors.transparent,
                       focusColor: Colors.transparent,
@@ -509,8 +504,8 @@ class _SlidableTileTicketListProcessingWidgetState
                       onLongPress: () async {
                         // falta logica en drag end
                         _model.setToCancel = await actions.sendjsontourl(
-                          '{\"ticket_number\": ${widget!.ticketNumber}}',
-                          currentJwtToken!,
+                          '{\"ticket_number\": ${widget.ticketNumber}}',
+                          currentJwtToken,
                           FFAppConstants.setTicketToCancel,
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -521,7 +516,7 @@ class _SlidableTileTicketListProcessingWidgetState
                                 color: FlutterFlowTheme.of(context).primaryText,
                               ),
                             ),
-                            duration: Duration(milliseconds: 4000),
+                            duration: const Duration(milliseconds: 4000),
                             backgroundColor:
                                 FlutterFlowTheme.of(context).secondary,
                           ),

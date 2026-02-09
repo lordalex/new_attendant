@@ -38,7 +38,7 @@ class _MessagesWidgetState extends State<MessagesWidget> {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       _model.responseListJson = await actions.sendjsontourl(
         '{}',
-        currentJwtToken!,
+        currentJwtToken,
         FFAppConstants.getMessagesURL,
       );
       _model.responseColumn = _model.responseListJson!;
@@ -57,7 +57,7 @@ class _MessagesWidgetState extends State<MessagesWidget> {
               color: FlutterFlowTheme.of(context).primaryText,
             ),
           ),
-          duration: Duration(milliseconds: 4000),
+          duration: const Duration(milliseconds: 4000),
           backgroundColor: FlutterFlowTheme.of(context).secondary,
         ),
       );
@@ -74,14 +74,14 @@ class _MessagesWidgetState extends State<MessagesWidget> {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: AlignmentDirectional(0.0, 0.0),
+      alignment: const AlignmentDirectional(0.0, 0.0),
       child: Container(
         width: MediaQuery.sizeOf(context).width * 0.94,
         height: MediaQuery.sizeOf(context).height * 0.9,
         decoration: BoxDecoration(
           color: FlutterFlowTheme.of(context).secondaryBackground,
         ),
-        alignment: AlignmentDirectional(0.0, 0.0),
+        alignment: const AlignmentDirectional(0.0, 0.0),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.max,
@@ -97,17 +97,17 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                     wrapWithModel(
                       model: _model.emptyMessageModel,
                       updateCallback: () => safeSetState(() {}),
-                      child: EmptyMessageWidget(),
+                      child: const EmptyMessageWidget(),
                     ),
                   ],
                 ),
-              if (functions.jsontoArray(_model.responseColumn).length > 0)
+              if (functions.jsontoArray(_model.responseColumn).isNotEmpty)
                 Builder(
                   builder: (context) {
                     final messageList =
                         functions.jsontoArray(_model.responseColumn).toList();
                     if (messageList.isEmpty) {
-                      return EmptyMessageWidget(
+                      return const EmptyMessageWidget(
                         messageJson: '',
                       );
                     }
@@ -118,7 +118,7 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                           List.generate(messageList.length, (messageListIndex) {
                         final messageListItem = messageList[messageListIndex];
                         return Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               16.0, 0.0, 16.0, 1.0),
                           child: Container(
                             width: double.infinity,
@@ -130,7 +130,7 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                                   blurRadius: 0.0,
                                   color: FlutterFlowTheme.of(context)
                                       .primaryBackground,
-                                  offset: Offset(
+                                  offset: const Offset(
                                     0.0,
                                     1.0,
                                   ),
@@ -139,7 +139,7 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                               borderRadius: BorderRadius.circular(12.0),
                             ),
                             child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   16.0, 0.0, 16.0, 0.0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
@@ -148,8 +148,9 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                                   Expanded(
                                     flex: 4,
                                     child: Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 12.0, 12.0, 12.0),
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0.0, 12.0, 12.0, 12.0),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.max,
                                         crossAxisAlignment:
@@ -165,7 +166,8 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                                               shape: BoxShape.circle,
                                             ),
                                             child: Padding(
-                                              padding: EdgeInsets.all(2.0),
+                                              padding:
+                                                  const EdgeInsets.all(2.0),
                                               child: ClipRRect(
                                                 borderRadius:
                                                     BorderRadius.circular(40.0),
@@ -180,8 +182,9 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                                           ),
                                           Expanded(
                                             child: Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(
                                                       12.0, 0.0, 0.0, 0.0),
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.max,
@@ -199,12 +202,9 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                                                     children: [
                                                       Padding(
                                                         padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    4.0,
-                                                                    0.0,
-                                                                    0.0),
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(0.0,
+                                                                4.0, 0.0, 0.0),
                                                         child: Text(
                                                           functions.getkeyfromjsonstring(
                                                               functions.getkeyfromjsonstring(
@@ -231,17 +231,14 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                                                   ),
                                                   Padding(
                                                     padding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(0.0, 4.0,
-                                                                0.0, 0.0),
+                                                        const EdgeInsetsDirectional
+                                                            .fromSTEB(
+                                                            0.0, 4.0, 0.0, 0.0),
                                                     child: Text(
-                                                      functions.getkeyfromjsonstring(messageListItem,
-                                                                      'destinatary') !=
-                                                                  null &&
-                                                              functions.getkeyfromjsonstring(
-                                                                      messageListItem,
-                                                                      'destinatary') !=
-                                                                  ''
+                                                      functions.getkeyfromjsonstring(
+                                                                  messageListItem,
+                                                                  'destinatary') !=
+                                                              ''
                                                           ? functions.getkeyfromjsonstring(
                                                               functions.getkeyfromjsonstring(
                                                                   messageListItem,
@@ -306,7 +303,7 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                                                           0.8,
                                                       height: double.infinity,
                                                       constraints:
-                                                          BoxConstraints(
+                                                          const BoxConstraints(
                                                         minHeight: 25.0,
                                                         maxHeight: 500.0,
                                                       ),
@@ -316,7 +313,8 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                                                                     context)
                                                                 .accent2,
                                                         borderRadius:
-                                                            BorderRadius.only(
+                                                            const BorderRadius
+                                                                .only(
                                                           bottomLeft:
                                                               Radius.circular(
                                                                   15.0),
@@ -338,12 +336,9 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                                                       ),
                                                       child: Padding(
                                                         padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    4.0,
-                                                                    0.0,
-                                                                    0.0),
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(0.0,
+                                                                4.0, 0.0, 0.0),
                                                         child: Text(
                                                           functions
                                                               .getkeyfromjsonstring(
@@ -379,8 +374,9 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 20.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 20.0, 0.0, 0.0),
                                     child: Container(
                                       width: 12.0,
                                       height: 12.0,
@@ -389,7 +385,8 @@ class _MessagesWidgetState extends State<MessagesWidget> {
                                             .secondary,
                                         shape: BoxShape.circle,
                                       ),
-                                      alignment: AlignmentDirectional(0.0, 0.0),
+                                      alignment:
+                                          const AlignmentDirectional(0.0, 0.0),
                                     ),
                                   ),
                                 ],

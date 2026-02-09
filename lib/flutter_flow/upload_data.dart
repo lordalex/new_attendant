@@ -60,25 +60,25 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
   bool includeDimensions = false,
   bool includeBlurHash = false,
 }) async {
-  final createUploadMediaListTile =
-      (String label, MediaSource mediaSource) => ListTile(
-            title: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.getFont(
-                pickerFontFamily,
-                color: textColor,
-                fontWeight: FontWeight.w600,
-                fontSize: 20,
-              ),
-            ),
-            tileColor: backgroundColor,
-            dense: false,
-            onTap: () => Navigator.pop(
-              context,
-              mediaSource,
-            ),
-          );
+  ListTile createUploadMediaListTile(String label, MediaSource mediaSource) =>
+      ListTile(
+        title: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.getFont(
+            pickerFontFamily,
+            color: textColor,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+          ),
+        ),
+        tileColor: backgroundColor,
+        dense: false,
+        onTap: () => Navigator.pop(
+          context,
+          mediaSource,
+        ),
+      );
   final mediaSource = await showModalBottomSheet<MediaSource>(
       context: context,
       backgroundColor: backgroundColor,
@@ -88,7 +88,7 @@ Future<List<SelectedFile>?> selectMediaWithSourceBottomSheet({
           children: [
             if (!kIsWeb) ...[
               Padding(
-                padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                 child: ListTile(
                   title: Text(
                     'Choose Source',
@@ -305,7 +305,7 @@ List<SelectedFile> selectedFilesFromUploadedFiles(
         final file = entry.value;
         return SelectedFile(
             storagePath: _getStoragePath(
-              storageFolderPath != null ? storageFolderPath : null,
+              storageFolderPath,
               file.name!,
               false,
               isMultiData ? index : null,
@@ -367,7 +367,7 @@ void showUploadMessage(
           children: [
             if (showLoading)
               Padding(
-                padding: EdgeInsetsDirectional.only(end: 10.0),
+                padding: const EdgeInsetsDirectional.only(end: 10.0),
                 child: CircularProgressIndicator(
                   valueColor: Theme.of(context).brightness == Brightness.dark
                       ? AlwaysStoppedAnimation<Color>(
@@ -378,7 +378,8 @@ void showUploadMessage(
             Text(message),
           ],
         ),
-        duration: showLoading ? Duration(days: 1) : Duration(seconds: 4),
+        duration:
+            showLoading ? const Duration(days: 1) : const Duration(seconds: 4),
       ),
     );
 }

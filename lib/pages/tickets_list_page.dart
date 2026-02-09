@@ -8,11 +8,11 @@ class TicketsListPage extends StatelessWidget {
   final List<String> ticketsJsonList;
 
   const TicketsListPage({
-    Key? key,
+    super.key,
     required this.apiUrl,
     required this.idToken,
     required this.ticketsJsonList,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

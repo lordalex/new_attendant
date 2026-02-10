@@ -782,6 +782,12 @@ class _TicketWidgetState extends State<TicketWidget>
                                                     ),
                                                     FFButtonWidget(
                                                       onPressed: () async {
+                                                        print('[SET BUTTON] Tapped!');
+                                                        print('[SET BUTTON] pinTextController: ${_model.pinTextController}');
+                                                        print('[SET BUTTON] PIN text: "${_model.pinTextController?.text}"');
+                                                        print('[SET BUTTON] imagesSelected count: ${_model.imagesSelected.length}');
+                                                        print('[SET BUTTON] imageSelectedIndex: ${_model.imageSelectedIndex}');
+                                                        print('[SET BUTTON] ticketID: ${widget.ticketID}');
                                                         if (_model
                                                                 .pinTextController
                                                                 .text !=
@@ -835,37 +841,68 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                         .error,
                                                               ),
                                                             );
+                                                            safeSetState(() {});
+                                                            return;
                                                           }
 
                                                           _model.responsepintoticket =
                                                               await actions
                                                                   .sendjsontourl(
-                                                            '{\"PIN\": \"${_model.pinTextController.text}\", \"id\": ${widget.ticketID}, \"photos\": ${functions.arrayToJson(_model.imagesArray.toList())}}',
+                                                            '{\"PIN\": \"${_model.pinTextController.text}\", \"id\": \"${widget.ticketID}\", \"photos\": ${functions.arrayToJson(_model.imagesArray.toList())}}',
                                                             currentJwtToken,
                                                             FFAppConstants
-                                                                .setPINtoticket,
-                                                          );
-                                                          _model.searchResultsTicketInPIN =
-                                                              await actions
-                                                                  .sendjsontourl(
-                                                            ' {    \"modelName\": \"Ticket\",    \"searchCriteria\": {\"ticket_number\": ${widget.ticketID}}}',
-                                                            currentJwtToken,
-                                                            FFAppConstants
-                                                                .searchURL,
+                                                                .setTicketToParked,
                                                           );
 
-                                                          context.pushNamed(
-                                                            TicketWidget
-                                                                .routeName,
-                                                            queryParameters: {
-                                                              'ticketID':
-                                                                  serializeParam(
-                                                                widget.ticketID,
-                                                                ParamType
-                                                                    .String,
+                                                          if (_model.responsepintoticket != null &&
+                                                              _model.responsepintoticket!.isNotEmpty &&
+                                                              (_model.responsepintoticket!.trimLeft().startsWith('{') ||
+                                                               _model.responsepintoticket!.trimLeft().startsWith('['))) {
+                                                            _model.searchResultsTicketInPIN =
+                                                                await actions
+                                                                    .sendjsontourl(
+                                                              ' {    \"modelName\": \"Ticket\",    \"searchCriteria\": {\"ticket_number\": \"${widget.ticketID}\"}}',
+                                                              currentJwtToken,
+                                                              FFAppConstants
+                                                                  .searchURL,
+                                                            );
+
+                                                            context.pushNamed(
+                                                              TicketWidget
+                                                                  .routeName,
+                                                              queryParameters: {
+                                                                'ticketID':
+                                                                    serializeParam(
+                                                                  widget.ticketID,
+                                                                  ParamType
+                                                                      .String,
+                                                                ),
+                                                              }.withoutNulls,
+                                                            );
+                                                          } else {
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              SnackBar(
+                                                                content: Text(
+                                                                  'Invalid PIN or request failed. Please try again.',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .primaryBackground,
+                                                                  ),
+                                                                ),
+                                                                duration: const Duration(
+                                                                    milliseconds:
+                                                                        4000),
+                                                                backgroundColor:
+                                                                    FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .error,
                                                               ),
-                                                            }.withoutNulls,
-                                                          );
+                                                            );
+                                                          }
                                                         } else {
                                                           ScaffoldMessenger.of(
                                                                   context)
@@ -1113,15 +1150,15 @@ class _TicketWidgetState extends State<TicketWidget>
                                                             _model.responsepintoticketCompleted =
                                                                 await actions
                                                                     .sendjsontourl(
-                                                              '{\"PIN\": \"${_model.pINProcessingToCompletedTextController.text}\", \"id\": ${widget.ticketID}}',
+                                                              '{\"PIN\": \"${_model.pINProcessingToCompletedTextController.text}\", \"id\": \"${widget.ticketID}\", \"status\": \"Completed\"}',
                                                               currentJwtToken,
                                                               FFAppConstants
-                                                                  .setPINtoCompleted,
+                                                                  .setTicketStatus,
                                                             );
                                                             _model.searchResultsTicketInPINCompleted =
                                                                 await actions
                                                                     .sendjsontourl(
-                                                              ' {    \"modelName\": \"Ticket\",    \"searchCriteria\": {\"ticket_number\": ${widget.ticketID}}}',
+                                                              ' {    \"modelName\": \"Ticket\",    \"searchCriteria\": {\"ticket_number\": \"${widget.ticketID}\"}}',
                                                               currentJwtToken,
                                                               FFAppConstants
                                                                   .searchURL,
@@ -1171,6 +1208,29 @@ class _TicketWidgetState extends State<TicketWidget>
                                                                         .String,
                                                                   ),
                                                                 }.withoutNulls,
+                                                              );
+                                                            } else {
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                SnackBar(
+                                                                  content: Text(
+                                                                    'Invalid PIN. Please try again.',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .primaryBackground,
+                                                                    ),
+                                                                  ),
+                                                                  duration: const Duration(
+                                                                      milliseconds:
+                                                                          4000),
+                                                                  backgroundColor:
+                                                                      FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .error,
+                                                                ),
                                                               );
                                                             }
                                                           } else {
